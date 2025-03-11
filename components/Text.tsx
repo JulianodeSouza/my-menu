@@ -1,23 +1,23 @@
-import { forwardRef } from 'react';
-import { StyleSheet, Text, TouchableOpacityProps, useColorScheme, View } from 'react-native';
+import { forwardRef, ReactNode } from "react";
+import { StyleSheet, Text, TouchableOpacityProps, useColorScheme, View } from "react-native";
 
-import { darkTheme, lightTheme } from '~/theme';
+import { darkTheme, lightTheme } from "~/theme";
 type TextProps = {
-  title: string;
+  children: ReactNode;
   textProps?: any;
 } & TouchableOpacityProps;
 
-export const TextComponent = forwardRef<View, TextProps>(({ title, textProps }) => {
-  const theme = useColorScheme() === 'dark' ? darkTheme : lightTheme;
+export const TextComponent = forwardRef<View, TextProps>(({ children, ...textProps }) => {
+  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
 
-  return <Text style={[styles.text, textProps.style, { color: theme.text }]}>{title}</Text>;
+  return <Text style={[styles.text, textProps.style, { color: theme.text }]}>{children}</Text>;
 });
 
 const styles = StyleSheet.create({
   text: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
 });
