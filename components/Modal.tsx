@@ -1,6 +1,5 @@
-import { Button, Overlay } from '@rneui/themed';
-import { ReactNode } from 'react';
-import { StyleSheet } from 'react-native';
+import { Button, Overlay } from "@rneui/themed";
+import { ReactNode } from "react";
 
 type ModalProps = {
   children: ReactNode;
@@ -20,19 +19,3 @@ export const Modal = ({ children, visible, setVisible }: ModalProps) => {
     </Overlay>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    margin: 10,
-  },
-  textPrimary: {
-    marginVertical: 20,
-    textAlign: 'center',
-    fontSize: 20,
-  },
-  textSecondary: {
-    marginBottom: 10,
-    textAlign: 'center',
-    fontSize: 17,
-  },
-});
