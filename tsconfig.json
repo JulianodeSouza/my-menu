@@ -1,5 +1,4 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": false,
     "jsx": "react-jsx",
@@ -16,5 +15,6 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "components/Button.Primarytsx"
-  ]
+  ],
+  "extends": "expo/tsconfig.base"
 }

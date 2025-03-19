@@ -1,7 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack } from "expo-router";
+import { SQLiteProvider } from "expo-sqlite";
 import { useCallback, useEffect } from "react";
 import { Appearance, ColorSchemeName } from "react-native";
+import { initializeDatabase } from "./db/initializeDatabase";
 
 export default function Layout() {
   const getTheme = useCallback(async () => {
@@ -16,5 +18,9 @@ export default function Layout() {
     getTheme();
   }, [getTheme]);
 
-  return <Stack />;
+  return (
+    <SQLiteProvider databaseName="myMenu.db" onInit={initializeDatabase} useSuspense>
+      <Stack />;
+    </SQLiteProvider>
+  );
 }
