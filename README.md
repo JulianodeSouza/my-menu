@@ -4,11 +4,6 @@
 Aplicativo criado visando ajudar na rotina alimentar e organizacional do usuário, possibilitando um planejamento e controle
 muito maior da sua alimentação de forma saudável.
 
-| :placard: Vitrine.Dev |     |
-| -------------  | --- |
-| :sparkles: Nome        | **My Menu**
-| :label: Tecnologias | React-native, Expo
-
 ### `Descrição do Projeto`
 
 ## `Desenvolvimento`
