@@ -5,7 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": [
-        "*"
+        "./src/*"
       ]
     }
   },
@@ -14,7 +14,7 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "components/Button.Primarytsx"
+    "src/components/Button.Primarytsx"
   ],
   "extends": "expo/tsconfig.base"
 }

@@ -6,8 +6,7 @@ export const Input = ({ ...rest }: TextInputProps) => {
 
 const styles = StyleSheet.create({
   input: {
-    borderWidth: 1,
-    borderColor: "#000",
-    borderStyle: "solid",
+    backgroundColor: "#EDEDED",
+    marginBottom: 10,
   },
 });

@@ -1,8 +1,8 @@
 import { Button } from "@rneui/base";
 import { forwardRef } from "react";
 import { StyleSheet, Text, TouchableOpacityProps, useColorScheme, View } from "react-native";
+import { darkTheme, lightTheme } from "theme";
 
-import { darkTheme, lightTheme } from "~/theme";
 
 type ButtonProps = {
   title: string;

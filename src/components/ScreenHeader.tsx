@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import { useColorScheme } from "react-native";
-import { darkTheme, lightTheme } from "~/theme";
+import { darkTheme, lightTheme } from "theme";
 
 type HeaderProps = {
   headerShown?: boolean;

@@ -1,15 +1,53 @@
 import Feather from "@expo/vector-icons/Feather";
 import { FAB } from "@rneui/base";
 import { Link } from "expo-router";
+import { useEffect, useState } from "react";
 import { StatusBar, StyleSheet, useColorScheme } from "react-native";
-
+import { darkTheme, lightTheme } from "theme";
 import { Container } from "~/components/Container";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
-import { darkTheme, lightTheme } from "~/theme";
 
 export default function Home() {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const [loadItems, setLoadItems] = useState(false);
+
+
+
+
+useEffect(() => {
+
+  const loadData = async () => {
+
+  
+
+
+
+
+
+
+
+  };
+
+
+
+  if(loadItems) {
+    setLoadItems(false);
+
+  }
+
+
+
+
+
+}, [])
+
+
+
+
+
+
+
 
   return (
     <>

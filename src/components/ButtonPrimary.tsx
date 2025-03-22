@@ -7,8 +7,8 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { darkTheme, lightTheme } from "theme";
 
-import { darkTheme, lightTheme } from "~/theme";
 
 type ButtonProps = {
   title: string;

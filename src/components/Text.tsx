@@ -1,5 +1,5 @@
 import { Text, useColorScheme } from "react-native";
-import { darkTheme, lightTheme } from "~/theme";
+import { darkTheme, lightTheme } from "theme";
 
 export const TextComponent = ({ children, ...TextProps }) => {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
