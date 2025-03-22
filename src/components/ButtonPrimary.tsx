@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { darkTheme, lightTheme } from "theme";
 
-
 type ButtonProps = {
   title: string;
   icon?: React.ReactNode;

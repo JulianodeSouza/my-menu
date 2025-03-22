@@ -3,13 +3,12 @@ import { forwardRef } from "react";
 import { StyleSheet, Text, TouchableOpacityProps, useColorScheme, View } from "react-native";
 import { darkTheme, lightTheme } from "theme";
 
-
 type ButtonProps = {
   title: string;
   icon?: React.ReactNode;
 } & TouchableOpacityProps;
 
-export const ButtonText = forwardRef<View, ButtonProps>(({ title, icon, ...buttonProps }, ref) => {
+export const ButtonTextSecondary = forwardRef<View, ButtonProps>(({ title, icon, ...buttonProps }, ref) => {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
 
   return (
@@ -19,7 +18,7 @@ export const ButtonText = forwardRef<View, ButtonProps>(({ title, icon, ...butto
       style={[styles.button, buttonProps.style, { backgroundColor: theme.primary }]}>
       {icon ? icon : null}
 
-      <Text style={[styles.buttonText, { color: theme.text }]}>{title}</Text>
+      <Text style={[styles.buttonText, { color: theme.textSecondary }]}>{title}</Text>
     </Button>
   );
 });

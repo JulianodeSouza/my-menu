@@ -6,7 +6,10 @@ export const Input = ({ ...rest }: TextInputProps) => {
 
 const styles = StyleSheet.create({
   input: {
-    backgroundColor: "#EDEDED",
+    borderWidth: 1,
+    borderColor: "#000",
+    padding: 10,
+    borderRadius: 10,
     marginBottom: 10,
   },
 });

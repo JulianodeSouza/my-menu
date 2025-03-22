@@ -1,70 +1,76 @@
-import { Picker } from "@react-native-picker/picker";
 import { Card } from "@rneui/base";
-import { useSQLiteContext } from "expo-sqlite";
-import { Formik } from "formik";
+import { useNavigation } from "expo-router";
+import { useFormik } from "formik";
 import { Alert, StyleSheet } from "react-native";
 import { ButtonPrimary } from "~/components/ButtonPrimary";
+import { ButtonTextSecondary } from "~/components/ButtonTextSecondary";
 import { Container } from "~/components/Container";
 import { Input } from "~/components/Input";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
-import ListPurchaseDatabase from "~/db/listPurchaseDatabase";
+import SelectCategories from "~/components/SelectCategories";
+import { useListPurchaseDatabase } from "~/db/listPurchaseDatabase";
 
 export default function AddItems() {
-  const database = useSQLiteContext(); // Agora o hook está dentro do componente
+  const initialState = { name: "", category: "1", quantity: "" };
+  const purchaseListDatabase = useListPurchaseDatabase();
+  const navigation = useNavigation();
+
+  const formik = useFormik({
+    initialValues: initialState,
+    onSubmit: async (values) => {
+      createItem(values);
+    },
+  });
 
   const createItem = async (values) => {
-    await new ListPurchaseDatabase(database).create({
+    await purchaseListDatabase.create({
       name: values.name,
       quantity: Number(values.quantity),
       category: values.category,
     });
 
     Alert.alert("Sucesso", "Item adicionado com sucesso!");
+    formik.resetForm();
   };
 
   return (
     <Container>
-      <HeaderScreen title="Adicionar itens" />
+      <HeaderScreen headerShown={false} />
 
       <ScreenContent style={sytle.container}>
-        <Formik
-          initialValues={{ name: "", category: "bebidas", quantity: "" }}
-          onSubmit={(values) => createItem(values)}>
-          {({ handleChange, handleSubmit, values, setFieldValue }) => (
-            <Card containerStyle={sytle.card}>
-              <Card.Title>Informe os dados do produto</Card.Title>
-              <Card.Divider />
+        <Card containerStyle={sytle.card}>
+          <Card.Title>Informe os dados do produto</Card.Title>
+          <Card.Divider />
 
-              <Input
-                placeholder="Produto"
-                onChangeText={handleChange("name")}
-                value={values.name || ""}
-              />
+          <Input
+            placeholder="Produto"
+            onChangeText={formik.handleChange("name")}
+            value={formik.values.name || ""}
+          />
 
-              <Input
-                placeholder="Quantidade"
-                onChangeText={handleChange("quantity")}
-                value={values.quantity || ""}
-                keyboardType="numeric"
-              />
+          <Input
+            placeholder="Quantidade"
+            onChangeText={formik.handleChange("quantity")}
+            value={formik.values.quantity || ""}
+            keyboardType="numeric"
+          />
 
-              <Picker
-                placeholder="Categoria"
-                selectedValue={values.category || ""}
-                onValueChange={(itemValue) => setFieldValue("category", itemValue)}>
-                <Picker.Item label="Bebidas" value="bebidas" />
-                <Picker.Item label="Carnes" value="carnes" />
-              </Picker>
+          <SelectCategories
+            value={formik.values.category}
+            handleChange={(value) => {
+              formik.setFieldValue("category", value);
+            }}
+          />
 
-              <ButtonPrimary
-                style={sytle.buttonSave}
-                onPress={() => handleSubmit()}
-                title="Adicionar"
-              />
-            </Card>
-          )}
-        </Formik>
+          <ButtonPrimary
+            style={sytle.buttonSave}
+            onPress={() => formik.handleSubmit()}
+            title="Adicionar"
+          />
+
+          <ButtonTextSecondary title="Voltar" onPress={() => navigation.goBack()} />
+        </Card>
       </ScreenContent>
     </Container>
   );
@@ -79,5 +85,5 @@ const sytle = StyleSheet.create({
     padding: 20,
     width: "90%",
   },
-  buttonSave: { marginTop: 10 },
+  buttonSave: { marginVertical: 20 },
 });
