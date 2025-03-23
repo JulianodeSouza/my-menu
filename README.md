@@ -1,8 +1,8 @@
 
 # My Menu
 
-Aplicativo criado visando ajudar na rotina alimentar e organizacional do usuário, possibilitando um planejamento e controle
-muito maior da sua alimentação de forma saudável.
+Aplicativo criado visando ajudar na organização das listas de compras do supermercado, possibilitando um planejamento e controle
+muito maior.
 
 ### `Descrição do Projeto`
 
@@ -13,8 +13,12 @@ Projeto no Figma -> https://www.figma.com/file/vA65KfG5XJqgXhZddHpUSp/My-Menu?no
 
 
 ## `Funcionalidades`
-- `Lista de Mercado`: Sempre que o usuário desejar fazer uma nova receita ou precise comprar algo para o cardápio da semana, pode adicionar à lista de mercado, para que ele chegue lá e tenha tudo que necessita na palma da sua mão.
-
+- `Inclusão de produtos`: Permite o usuário adicionar quantos itens quiser a lista, informando a quantidade
+- `Listagem de produtos`: Lista dos itens adicionados com a quantidade
+- `Edição de produtos`: Permite alterar um produto e a sua quantidade
+- `Exclusão de produtos`: Permite o usuário remover um produto da sua lista
+- `Informar preço`: Ao marcar um item pego, permite o usuário infomar a quantidade real que foi pega e o preço do produto somando ao total da compra
+  
 ## ✔️ `Tecnologias utilizadas`
 - `React-native`
 - `SQLite`
