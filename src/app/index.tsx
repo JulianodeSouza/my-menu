@@ -1,19 +1,26 @@
 import Feather from "@expo/vector-icons/Feather";
-import { CheckBox, Divider, FAB } from "@rneui/base";
+import { Divider, FAB } from "@rneui/base";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, StatusBar, StyleSheet, useColorScheme, View } from "react-native";
 import { darkTheme, lightTheme } from "theme";
 import { Container } from "~/components/Container";
+import ModalEditItem from "~/components/ModalEditItem";
+import ModalMarkItemList from "~/components/ModalMarkItemList";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
 import { TextComponent } from "~/components/Text";
+import { TextTouchable } from "~/components/TextTouchable";
 import { useListPurchaseDatabase } from "~/db/listPurchaseDatabase";
+import { formatMonetary } from "~/utils/stringUtils";
 
 export default function Home() {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
   const [items, setItems] = useState([]);
   const [loadItems, setLoadItems] = useState(false);
+  const [infoDialog, setInfoDialog] = useState({ open: false, item: {} });
+  const [infoDialogEdit, setInfoDialogEdit] = useState({ open: false, idItem: 0 });
+  const [totalPurchase, setTotalPurchase] = useState(0);
   const purchaseListDatabase = useListPurchaseDatabase();
 
   useEffect(() => {
@@ -59,13 +66,16 @@ export default function Home() {
     <>
       <HeaderScreen headerShown={false} />
       <Container>
-        <StatusBar barStyle={theme === darkTheme ? "dark-content" : "light-content"} />
+        <StatusBar
+          animated={true}
+          barStyle={theme === darkTheme ? "dark-content" : "light-content"}
+        />
 
-        <ScreenContent>
+        <View style={{ padding: 25 }}>
           <Link href={{ pathname: "/settings" }} asChild>
             <Feather name="settings" size={35} color={theme.text} style={styles.settingsButton} />
           </Link>
-        </ScreenContent>
+        </View>
 
         <ScreenContent style={styles.containerList}>
           <ScrollView>
@@ -76,19 +86,19 @@ export default function Home() {
                 <Divider />
                 {item.items.map((item) => (
                   <View key={item.id} style={styles.list}>
-                    <CheckBox
-                      size={32}
-                      checked={item.checked}
-                      onPress={() => {
-                        purchaseListDatabase.updateCheck(item.id, !item.checked);
-                        setLoadItems(true);
+                    <TextTouchable
+                      onLongPress={() => {
+                        setInfoDialogEdit({ open: true, idItem: item.id });
                       }}
-                      iconType="material-community"
-                      checkedIcon="checkbox-outline"
-                      uncheckedIcon={"checkbox-blank-outline"}
-                    />
-
-                    <TextComponent style={styles.textItemList}>{item.name}</TextComponent>
+                      onPress={() => {
+                        setInfoDialog({ open: true, item });
+                      }}>
+                      <View>
+                        <TextComponent style={styles.textItemList}>
+                          - {item.name} - {item.quantity}
+                        </TextComponent>
+                      </View>
+                    </TextTouchable>
                   </View>
                 ))}
               </View>
@@ -96,12 +106,35 @@ export default function Home() {
           </ScrollView>
         </ScreenContent>
 
-        <ScreenContent style={styles.containerButtonAdd}>
-          <Link href={{ pathname: "/addItems" }} asChild>
-            <FAB style={styles.addButton} icon={{ name: "add", color: "white" }} color="green" />
-          </Link>
+        <ScreenContent style={{ justifyContent: "flex-end" }}>
+          <View style={styles.containerButtonAdd}>
+            <TextTouchable
+              onPress={() => {
+                console.log("##### finalizar compra");
+              }}>
+              <View>
+                <TextComponent style={styles.textTotal}>
+                  Total: {formatMonetary(totalPurchase)}
+                </TextComponent>
+              </View>
+            </TextTouchable>
+
+            <Link href={{ pathname: "/addItems" }} asChild>
+              <FAB style={styles.addButton} icon={{ name: "add", color: "white" }} color="green" />
+            </Link>
+          </View>
         </ScreenContent>
       </Container>
+
+      {infoDialog.open && (
+        <ModalMarkItemList
+          {...{ infoDialog, setInfoDialog, setLoadItems, totalPurchase, setTotalPurchase }}
+        />
+      )}
+
+      {infoDialogEdit.open && (
+        <ModalEditItem {...{ infoDialogEdit, setInfoDialogEdit, setLoadItems }} />
+      )}
     </>
   );
 }
@@ -111,9 +144,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
   },
-  list: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
+  list: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
   textItemList: {
     fontSize: 20,
+    padding: 15,
   },
   title: {
     fontSize: 20,
@@ -121,9 +159,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 10,
   },
+  textTotal: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 35,
+    padding: 15,
+  },
   containerButtonAdd: {
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   addButton: {
     marginBottom: 35,

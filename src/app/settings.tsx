@@ -4,6 +4,7 @@ import { CheckBox, Divider, Text } from "@rneui/base";
 import { useState } from "react";
 import { Appearance, ColorSchemeName, StyleSheet, useColorScheme } from "react-native";
 import { ButtonPrimary } from "~/components/ButtonPrimary";
+import { ButtonTextSecondary } from "~/components/ButtonTextSecondary";
 import { Container } from "~/components/Container";
 import { Modal } from "~/components/Modal";
 import { ScreenContent } from "~/components/ScreenContent";
@@ -12,7 +13,11 @@ import { TextComponent } from "~/components/Text";
 
 export default function Settings() {
   const [themeSelected, setThemeSelected] = useState(useColorScheme());
-  const [visible, setVisible] = useState(false);
+  const [infoDialog, setInfoDialog] = useState({ open: false });
+
+  const handleClose = () => {
+    setInfoDialog({ open: false });
+  };
 
   const changeColorScheme = (colorScheme: ColorSchemeName) => {
     setThemeSelected(colorScheme);
@@ -38,7 +43,7 @@ export default function Settings() {
             title="Tema"
             style={styles.button}
             onPress={() => {
-              setVisible(true);
+              setInfoDialog({ open: true });
             }}
           />
 
@@ -49,8 +54,10 @@ export default function Settings() {
         </ScreenContent>
       </Container>
 
-      {visible && (
-        <Modal visible={visible} setVisible={setVisible}>
+      {infoDialog.open && (
+        <Modal visible={infoDialog.open} setVisible={setInfoDialog} style={styles.modalTheme}>
+          <TextComponent style={styles.titleModalTheme}>Selecione o tema</TextComponent>
+
           <CheckBox
             title={
               <Text>
@@ -80,6 +87,8 @@ export default function Settings() {
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
           />
+
+          <ButtonTextSecondary title="Fechar" onPress={handleClose} />
         </Modal>
       )}
     </>
@@ -91,6 +100,11 @@ const styles = StyleSheet.create({
     minWidth: 300,
     margin: 15,
   },
+  modalTheme: {
+    width: "80%",
+    padding: 20,
+  },
+  titleModalTheme: { textAlign: "center", fontSize: 24, padding: 10 },
   titleSection: {
     opacity: 0.5,
     fontSize: 14,

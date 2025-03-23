@@ -25,6 +25,7 @@ export default function SelectCategories({ value, handleChange }) {
 
   return (
     <Picker
+      style={{ backgroundColor: "#fff", borderWidth: 1 }}
       placeholder="Categoria"
       selectedValue={value || ""}
       onValueChange={(itemValue) => handleChange(itemValue)}>

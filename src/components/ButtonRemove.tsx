@@ -1,9 +1,15 @@
 import { forwardRef } from "react";
-import { StyleSheet, Text, TouchableOpacity, useColorScheme, View } from "react-native";
+import {
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    useColorScheme,
+    View
+} from "react-native";
 import { darkTheme, lightTheme } from "theme";
 import { ButtonProps } from "~/types/Buttons";
 
-export const ButtonPrimary = forwardRef<View, ButtonProps>(
+export const ButtonRemove = forwardRef<View, ButtonProps>(
   ({ title, icon, ...buttonProps }, ref) => {
     const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
 
@@ -11,7 +17,7 @@ export const ButtonPrimary = forwardRef<View, ButtonProps>(
       <TouchableOpacity
         ref={ref}
         {...buttonProps}
-        style={[styles.button, buttonProps.style, { backgroundColor: theme.primary }]}>
+        style={[styles.button, buttonProps.style, { backgroundColor: theme.error }]}>
         {icon ? icon : null}
 
         <Text style={[styles.buttonText, { color: theme.text }]}>{title}</Text>
