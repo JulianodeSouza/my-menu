@@ -7,6 +7,7 @@ import { ButtonTextSecondary } from "./ButtonTextSecondary";
 import { Input } from "./Input";
 import { Modal } from "./Modal";
 import { TextComponent } from "./Text";
+import { formatDecimal } from "~/utils/stringUtils";
 
 export default function ModalMarkItemList({
   infoDialog,
@@ -32,15 +33,14 @@ export default function ModalMarkItemList({
     onSubmit: async (values) => {
       calculateTotal(values);
 
-      // await purchaseListDatabase.updateCheck(infoDialog.item.id, !infoDialog.item.checked);
-      setLoadItems(true);
+      await purchaseListDatabase.updateCheck(infoDialog.item.id, !infoDialog.item.checked);
       handleClose();
     },
   });
 
   const calculateTotal = (values: typeof initialValues) => {
     const quantity = Number(values.quantity);
-    const amount = Number(values.amount.replace(",", "."));
+    const amount = formatDecimal(values.amount);
 
     const totalItem = Number(quantity) * Number(amount);
 
@@ -49,6 +49,7 @@ export default function ModalMarkItemList({
   };
 
   const handleClose = () => {
+    setLoadItems(true);
     setInfoDialog({ open: false });
   };
 

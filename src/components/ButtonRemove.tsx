@@ -7,9 +7,9 @@ import {
     View
 } from "react-native";
 import { darkTheme, lightTheme } from "theme";
-import { ButtonProps } from "~/types/Buttons";
+import { IButtonProps } from "~/types/Buttons";
 
-export const ButtonRemove = forwardRef<View, ButtonProps>(
+export const ButtonRemove = forwardRef<View, IButtonProps>(
   ({ title, icon, ...buttonProps }, ref) => {
     const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
 

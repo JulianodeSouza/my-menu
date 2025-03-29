@@ -1,11 +1,11 @@
 import { useSQLiteContext } from "expo-sqlite";
-import { Categories } from "~/types/categories";
+import { ICategories } from "~/types/categories";
 import AppError from "~/types/errors";
 
 export function useCategoryDatabase() {
   const database = useSQLiteContext();
 
-  async function create(data: Omit<Categories, "idCategory">) {
+  async function create(data: Omit<ICategories, "idCategory">) {
     // Prepara a query SQL para inserir um registro na tabela list_purchase
     const statement = await database.prepareAsync("insert into categories (name) values (:name)");
 
@@ -19,10 +19,10 @@ export function useCategoryDatabase() {
     }
   }
 
-  async function listAllCategories(): Promise<Categories[]> {
+  async function listAllCategories(): Promise<ICategories[]> {
     try {
       const sql = `select * from categories`;
-      const result = await database.getAllAsync<Categories>(sql);
+      const result = await database.getAllAsync<ICategories>(sql);
 
       return result;
     } catch (e) {
