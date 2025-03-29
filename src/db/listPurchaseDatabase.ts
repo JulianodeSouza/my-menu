@@ -1,11 +1,11 @@
 import { useSQLiteContext } from "expo-sqlite";
 import AppError from "~/types/errors";
-import { ListPurchase } from "../types/listPurchase";
+import { IListPurchase } from "../types/listPurchase";
 
 export function useListPurchaseDatabase() {
   const database = useSQLiteContext();
 
-  async function create(data: Omit<ListPurchase, "id">): Promise<void> {
+  async function create(data: Omit<IListPurchase, "id">): Promise<void> {
     // Prepara a query SQL para inserir um registro na tabela list_purchase
     const statement = await database.prepareAsync(
       "insert into list_purchase (name, quantity, category) values (:name, :quantity, :category)"
@@ -21,7 +21,7 @@ export function useListPurchaseDatabase() {
     }
   }
 
-  async function listAllItems(): Promise<ListPurchase[]> {
+  async function listAllItems(): Promise<IListPurchase[]> {
     try {
       const sql = `
       select lp.*,
@@ -29,7 +29,7 @@ export function useListPurchaseDatabase() {
       from list_purchase lp
       inner join categories c on lp.category = c.idCategory`;
 
-      const result = await database.getAllAsync<ListPurchase>(sql);
+      const result = await database.getAllAsync<IListPurchase>(sql);
 
       return result;
     } catch (e) {
@@ -37,7 +37,7 @@ export function useListPurchaseDatabase() {
     }
   }
 
-  async function getItemById(id: number): Promise<ListPurchase> {
+  async function getItemById(id: number): Promise<IListPurchase> {
     try {
       const sql = `
       select lp.*,
@@ -46,7 +46,7 @@ export function useListPurchaseDatabase() {
       inner join categories c on lp.category = c.idCategory
       where lp.id = ?`;
 
-      const result = await database.getFirstAsync<ListPurchase>(sql, [id]);
+      const result = await database.getFirstAsync<IListPurchase>(sql, [id]);
 
       return result;
     } catch (e) {
@@ -69,7 +69,7 @@ export function useListPurchaseDatabase() {
     }
   }
 
-  async function updateItem(id: number, data: Omit<ListPurchase, "id">) {
+  async function updateItem(id: number, data: Omit<IListPurchase, "id">) {
     const statement = await database.prepareAsync(
       `update list_purchase set name = ?, quantity = ?, category = ? where id = ?`
     );
@@ -78,8 +78,6 @@ export function useListPurchaseDatabase() {
       await statement.executeAsync([data.name, data.quantity, data.category, id]);
     } catch (e) {
       throw new AppError("Erro ao atualizar item na lista de compras", e);
-    } finally {
-      await statement.finalizeAsync();
     }
   }
 

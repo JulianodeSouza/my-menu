@@ -6,14 +6,14 @@ import { ButtonPrimary } from "~/components/ButtonPrimary";
 import { ButtonTextSecondary } from "~/components/ButtonTextSecondary";
 import { Input } from "~/components/Input";
 import SelectCategories from "~/components/SelectCategories";
-import { ListPurchase } from "~/types/listPurchase";
+import { IListPurchase } from "~/types/listPurchase";
 import { ButtonRemove } from "./ButtonRemove";
 
 type PropsForm = {
   save: (values: any) => void;
   handleClose: () => void;
   isEdit?: boolean;
-  item?: ListPurchase;
+  item?: IListPurchase;
   remove?: () => void;
 };
 
@@ -23,7 +23,7 @@ export default function FormListPurchase({ item, isEdit, save, remove, handleClo
 
   const Schema = yup.object().shape({
     name: yup.string().required("Informe o nome do produto"),
-    quantity: yup.number().required("Informe a quantidade de itens"),
+    quantity: yup.string().required("Informe a quantidade de itens"),
   });
 
   const formik = useFormik({

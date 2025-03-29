@@ -1,4 +1,4 @@
-export type Categories = {
+export type ICategories = {
   idCategory: number;
   name: string;
 };
