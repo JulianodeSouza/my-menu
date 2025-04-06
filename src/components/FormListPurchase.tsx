@@ -7,19 +7,18 @@ import { ButtonTextSecondary } from "~/components/ButtonTextSecondary";
 import { Input } from "~/components/Input";
 import SelectCategories from "~/components/SelectCategories";
 import { IListPurchase } from "~/types/listPurchase";
-import { ButtonRemove } from "./ButtonRemove";
+
+import SelectMeasuredUnits from "./SelectMeasuredUnits";
 
 type PropsForm = {
   save: (values: any) => void;
   handleClose: () => void;
   isEdit?: boolean;
   item?: IListPurchase;
-  remove?: () => void;
 };
 
-export default function FormListPurchase({ item, isEdit, save, remove, handleClose }: PropsForm) {
-  const initialState = { name: "", category: "1", quantity: "" };
-  const [loadData, setLoadData] = useState(false);
+export default function FormListPurchase({ save, handleClose }: PropsForm) {
+  const initialState = { name: "", category: "1", quantity: "", measuredUnit: "1" };
 
   const Schema = yup.object().shape({
     name: yup.string().required("Informe o nome do produto"),
@@ -34,21 +33,6 @@ export default function FormListPurchase({ item, isEdit, save, remove, handleClo
       formik.resetForm();
     },
   });
-
-  useEffect(() => {
-    if (loadData && item) {
-      setLoadData(false);
-      formik.setValues({
-        name: item.name,
-        category: item.category,
-        quantity: item.quantity.toString(),
-      });
-    }
-  }, [loadData, item]);
-
-  useEffect(() => {
-    setLoadData(true);
-  }, []);
 
   return (
     <>
@@ -77,21 +61,18 @@ export default function FormListPurchase({ item, isEdit, save, remove, handleClo
         }}
       />
 
+      <SelectMeasuredUnits
+        value={formik.values.measuredUnit}
+        handleChange={(value) => {
+          formik.setFieldValue("measuredUnit", value);
+        }}
+      />
+
       <ButtonPrimary
         style={sytle.buttons}
         onPress={() => formik.handleSubmit()}
-        title={isEdit ? "Atualizar" : "Adicionar"}
+        title="Adicionar"
       />
-
-      {isEdit && (
-        <ButtonRemove
-          style={sytle.buttons}
-          onPress={() => {
-            remove();
-          }}
-          title="Excluir"
-        />
-      )}
 
       <ButtonTextSecondary
         style={sytle.buttons}

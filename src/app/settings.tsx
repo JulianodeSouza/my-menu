@@ -47,10 +47,10 @@ export default function Settings() {
             }}
           />
 
-          <Divider />
-          <TextComponent style={styles.titleSection}>Lista de mercado</TextComponent>
+          {/* <Divider /> */}
+          {/* <TextComponent style={styles.titleSection}>Lista de mercado</TextComponent>
 
-          <ButtonPrimary title="Categorias" style={styles.button} />
+          <ButtonPrimary title="Categorias" style={styles.button} /> */}
         </ScreenContent>
       </Container>
 

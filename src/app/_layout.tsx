@@ -7,6 +7,8 @@ import { Provider as ReduxProvider } from "react-redux";
 import { store } from "~/store";
 import { initializeDatabase } from "../db/initializeDatabase";
 import { Toast } from "~/components/Toast";
+import { ModalProvider } from "~/contexts/DialogContext";
+import { ModalConfirmation } from "~/components/Dialogs/DialogConfirmation";
 
 export default function Layout() {
   const getTheme = useCallback(async () => {
@@ -22,11 +24,16 @@ export default function Layout() {
   }, [getTheme]);
 
   return (
-    <SQLiteProvider databaseName="myMenu.db" onInit={initializeDatabase} useSuspense>
-      <ReduxProvider store={store}>
-        <Stack />
-        <Toast />
-      </ReduxProvider>
-    </SQLiteProvider>
+    <ModalProvider>
+      <SQLiteProvider databaseName="myMenu.db" onInit={initializeDatabase} useSuspense>
+        <ReduxProvider store={store}>
+          <Stack />
+
+          <Toast />
+
+          <ModalConfirmation />
+        </ReduxProvider>
+      </SQLiteProvider>
+    </ModalProvider>
   );
 }

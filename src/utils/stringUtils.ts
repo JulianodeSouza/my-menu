@@ -1,7 +1,7 @@
 export function formatMonetary(value: number | string): string {
   const valueValid = value || 0;
 
-  return valueValid.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return valueValid.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }).toString();
 }
 
 export function formatDecimal(value: string): number {

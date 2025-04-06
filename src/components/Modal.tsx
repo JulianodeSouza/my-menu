@@ -1,6 +1,6 @@
 import { Overlay, OverlayProps } from "@rneui/themed";
 import { ReactNode } from "react";
-import { useColorScheme } from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 import { darkTheme, lightTheme } from "theme";
 
 type ModalProps = {
@@ -20,8 +20,15 @@ export const Modal = ({ children, visible, setVisible, ...rest }: ModalProps) =>
     <Overlay
       isVisible={visible}
       onBackdropPress={toggleOverlay}
-      overlayStyle={[{ backgroundColor: theme.background }, rest.style]}>
+      overlayStyle={[styles.overlay, { backgroundColor: theme.background }, rest.style]}>
       {children}
     </Overlay>
   );
 };
+
+const styles = StyleSheet.create({
+  overlay: {
+    padding: 20,
+    width: "80%",
+  },
+});
