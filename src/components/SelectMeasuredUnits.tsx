@@ -4,14 +4,14 @@ import { useCategoryDatabase } from "~/db/categoryDatabase";
 import { useMeasuredUnitDatabase } from "~/db/measuredUnit";
 
 export default function SelectMeasuredUnits({ value, handleChange }) {
-  const [measuredUnits, setCategories] = useState([]);
+  const [measuredUnits, setMeasuredUnits] = useState([]);
   const [loading, setLoading] = useState(false);
   const measuredUnitDatabase = useMeasuredUnitDatabase();
 
   useEffect(() => {
     const loadMeasuredUnits = async () => {
       const result = await measuredUnitDatabase.listAllMeasuredUnits();
-      setCategories(result);
+      setMeasuredUnits(result);
     };
 
     if (loading) {
