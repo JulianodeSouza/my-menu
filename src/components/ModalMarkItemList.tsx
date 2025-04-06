@@ -7,7 +7,10 @@ import { ButtonTextSecondary } from "./ButtonTextSecondary";
 import { Input } from "./Input";
 import { Modal } from "./Modal";
 import { TextComponent } from "./Text";
-import { formatDecimal } from "~/utils/stringUtils";
+import { formatDecimal, formatMonetary } from "~/utils/stringUtils";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { setInfoToast } from "~/store/reducers/geral";
 
 export default function ModalMarkItemList({
   infoDialog,
@@ -16,14 +19,16 @@ export default function ModalMarkItemList({
   totalPurchase,
   setTotalPurchase,
 }) {
+  const purchaseListDatabase = useListPurchaseDatabase();
+  const dispatch = useDispatch();
+
   const initialValues = {
-    quantity: "",
+    totalCaught: "",
     amount: "",
   };
-  const purchaseListDatabase = useListPurchaseDatabase();
 
   const Schema = Yup.object().shape({
-    quantity: Yup.number().required("Informe a quantidade de itens"),
+    totalCaught: Yup.number().required("Informe a quantidade de itens"),
     amount: Yup.string().required("Informe o valor"),
   });
 
@@ -31,20 +36,55 @@ export default function ModalMarkItemList({
     initialValues: initialValues,
     validationSchema: Schema,
     onSubmit: async (values) => {
-      calculateTotal(values);
+      const data = {
+        itemChecked: !infoDialog.item.checked,
+        totalCaught: Number(values.totalCaught),
+        amount: formatDecimal(values.amount),
+      };
 
-      await purchaseListDatabase.updateCheck(infoDialog.item.id, !infoDialog.item.checked);
+      calculateTotal(values, infoDialog.item.checked);
+      await purchaseListDatabase
+        .markItemList(infoDialog.item.id, data)
+        .then(() => {
+          const message = infoDialog.item.checked
+            ? "Item desmarcado com sucesso!"
+            : "Item marcado com sucesso!";
+
+          dispatch(
+            setInfoToast({
+              open: true,
+              message: message,
+              type: "success",
+            })
+          );
+        })
+        .catch((error) => {
+          console.error("Error updating item:", error);
+          dispatch(
+            setInfoToast({
+              open: true,
+              message: "Erro ao atualizar item",
+              type: "error",
+            })
+          );
+        });
       handleClose();
     },
   });
 
-  const calculateTotal = (values: typeof initialValues) => {
-    const quantity = Number(values.quantity);
+  const calculateTotal = (values: typeof initialValues, checked: boolean) => {
+    const totalCaught = Number(values.totalCaught);
     const amount = formatDecimal(values.amount);
+    const totalItem = Number(totalCaught) * Number(amount);
 
-    const totalItem = Number(quantity) * Number(amount);
+    let total = 0;
 
-    const total = totalPurchase + totalItem;
+    if (!checked) {
+      total = totalPurchase + totalItem;
+    } else {
+      total = totalPurchase - totalItem;
+    }
+
     setTotalPurchase(total);
   };
 
@@ -53,22 +93,49 @@ export default function ModalMarkItemList({
     setInfoDialog({ open: false });
   };
 
+  useEffect(() => {
+    const checkValuesMarked = async () => {
+      await purchaseListDatabase
+        .getItemById(infoDialog.item.id)
+        .then((item) => {
+          if (item.totalCaught && item.amount) {
+            formik.setFieldValue("totalCaught", item.totalCaught.toString());
+            formik.setFieldValue("amount", formatMonetary(item.amount).toString());
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          dispatch(
+            setInfoToast({
+              open: true,
+              message: "Erro ao atualizar item",
+              type: "error",
+            })
+          );
+        });
+    };
+
+    if (!!infoDialog.open && infoDialog.item.checked) {
+      checkValuesMarked();
+    }
+  }, [infoDialog.open, infoDialog.item.checked]);
+
   return (
-    <Modal visible={infoDialog.open} setVisible={setInfoDialog} style={styles.overlay}>
+    <Modal visible={infoDialog.open} setVisible={setInfoDialog}>
       <TextComponent style={styles.title}>{infoDialog.item.name}</TextComponent>
 
       <Input
         placeholder="Quantidade *"
-        onChangeText={formik.handleChange("quantity")}
-        value={formik.values.quantity || ""}
+        onChangeText={formik.handleChange("totalCaught")}
+        value={formik.values.totalCaught}
         keyboardType="numeric"
-        error={formik.touched.quantity && Boolean(formik.errors.quantity)}
-        textError={formik.errors.quantity}
+        error={formik.touched.totalCaught && Boolean(formik.errors.totalCaught)}
+        textError={formik.errors.totalCaught}
       />
 
       <Input
         placeholder="Valor *"
-        value={formik.values.amount || ""}
+        value={formik.values.amount}
         onChangeText={formik.handleChange("amount")}
         keyboardType="numeric"
         error={formik.touched.amount && Boolean(formik.errors.amount)}
@@ -78,7 +145,7 @@ export default function ModalMarkItemList({
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <ButtonTextSecondary title="Fechar" onPress={handleClose} />
         <ButtonPrimary
-          title="Marcar"
+          title={infoDialog.item.checked ? "Desmarcar" : "Marcar"}
           onPress={() => formik.handleSubmit()}
           style={{ width: "50%" }}
         />
@@ -93,9 +160,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     padding: 10,
     textAlign: "center",
-  },
-  overlay: {
-    padding: 20,
-    width: "80%",
   },
 });

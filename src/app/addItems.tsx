@@ -20,21 +20,35 @@ export default function AddItems() {
   };
 
   const save = async (values) => {
-    await purchaseListDatabase.create({
-      name: values.name,
+    const data = {
+      name: values.name.trim(),
       quantity: formatDecimal(values.quantity),
       category: values.category,
-    });
+      measuredUnit: values.measuredUnit,
+    };
 
-    dispatch(
-      setInfoToast({
-        open: true,
-        message: "Item adicionado com sucesso!",
-        type: "success",
+    await purchaseListDatabase
+      .create(data)
+      .then(() => {
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: "Item adicionado com sucesso!",
+            type: "success",
+          })
+        );
+
+        dispatch(setRefreshItens(true));
       })
-    );
-
-    dispatch(setRefreshItens(true));
+      .catch(() => {
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: "Houve um erro ao adicionar o item!",
+            type: "error",
+          })
+        );
+      });
   };
 
   return (

@@ -6,7 +6,8 @@ export const lightTheme = {
   primary: "#2A9D8F",
   secondary: "#FFD166",
   error: "#FF6B6B",
-  success: "#A8E6CF",
+  textError: "#fff",
+  success: "#008000",
   warning: "#FFD166",
 };
 
@@ -17,6 +18,7 @@ export const darkTheme = {
   primary: "#2A9D8F",
   secondary: "#F4C842",
   error: "#E85A5A",
-  success: "#81C995",
+  textError: "#fff",
+  success: "#008000",
   warning: "#F4C842",
 };

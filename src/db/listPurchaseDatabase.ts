@@ -1,18 +1,30 @@
 import { useSQLiteContext } from "expo-sqlite";
 import AppError from "~/types/errors";
-import { IListPurchase } from "../types/listPurchase";
+import { IItemChecked, IListPurchase } from "../types/listPurchase";
 
 export function useListPurchaseDatabase() {
   const database = useSQLiteContext();
 
+  async function finishPurchase(): Promise<void> {
+    const statement = await database.prepareAsync(`delete from list_purchase where checked = 1`);
+
+    try {
+      await statement.executeAsync();
+    } catch (e) {
+      throw new AppError("Erro ao finalizar compras", e);
+    } finally {
+      await statement.finalizeAsync();
+    }
+  }
+
   async function create(data: Omit<IListPurchase, "id">): Promise<void> {
     // Prepara a query SQL para inserir um registro na tabela list_purchase
     const statement = await database.prepareAsync(
-      "insert into list_purchase (name, quantity, category) values (:name, :quantity, :category)"
+      "insert into list_purchase (name, quantity, category, measuredUnit) values (:name, :quantity, :category, :measuredUnit)"
     );
 
     try {
-      await statement.executeAsync([data.name, data.quantity, data.category]);
+      await statement.executeAsync([data.name, data.quantity, data.category, data.measuredUnit]);
     } catch (e) {
       throw new AppError("Erro ao inserir item na lista de compras", e);
     } finally {
@@ -25,9 +37,11 @@ export function useListPurchaseDatabase() {
     try {
       const sql = `
       select lp.*,
-      c.name as category 
+      c.name as category,
+      mu.name as measuredUnit
       from list_purchase lp
-      inner join categories c on lp.category = c.idCategory`;
+      inner join categories c on lp.category = c.idCategory
+      inner join measured_unit mu on lp.measuredUnit = mu.id`;
 
       const result = await database.getAllAsync<IListPurchase>(sql);
 
@@ -55,29 +69,17 @@ export function useListPurchaseDatabase() {
     }
   }
 
-  async function updateCheck(id: number, itemChecked: boolean): Promise<void> {
+  async function markItemList(id: number, data: IItemChecked): Promise<void> {
     const statement = await database.prepareAsync(
-      `update list_purchase set checked = ? where id = ?`
+      `update list_purchase set checked = ?, totalCaught = ?, amount = ? where id = ?`
     );
 
     try {
-      await statement.executeAsync([itemChecked, id]);
+      await statement.executeAsync([data.itemChecked, data.totalCaught, data.amount, id]);
     } catch (e) {
       throw new AppError("Erro ao atualizar item na lista de compras", e);
     } finally {
       await statement.finalizeAsync();
-    }
-  }
-
-  async function updateItem(id: number, data: Omit<IListPurchase, "id">) {
-    const statement = await database.prepareAsync(
-      `update list_purchase set name = ?, quantity = ?, category = ? where id = ?`
-    );
-
-    try {
-      await statement.executeAsync([data.name, data.quantity, data.category, id]);
-    } catch (e) {
-      throw new AppError("Erro ao atualizar item na lista de compras", e);
     }
   }
 
@@ -97,8 +99,8 @@ export function useListPurchaseDatabase() {
     create,
     listAllItems,
     getItemById,
-    updateCheck,
-    updateItem,
+    markItemList,
     removeItem,
+    finishPurchase,
   };
 }

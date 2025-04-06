@@ -20,7 +20,7 @@ export const Toast = () => {
   function showToast() {
     Animated.timing(bottom, {
       toValue: 20,
-      duration: 1000,
+      duration: 3000,
       useNativeDriver: false,
     }).start(() => {
       Animated.timing(opacity, {
@@ -64,9 +64,11 @@ export const Toast = () => {
             { bottom, opacity, backgroundColor: getBackgroundColor(geral.infoToast.type) },
           ]}>
           <View style={style.toastInfo}>
-            <TextComponent>{geral.infoToast.message}</TextComponent>
+            <TextComponent style={{ color: theme.textError, fontWeight: "bold" }}>
+              {geral.infoToast.message}
+            </TextComponent>
             <MaterialIcons
-              style={{ alignContent: "center" }}
+              style={{ alignContent: "center", color: "white" }}
               name="close"
               size={24}
               color="white"
@@ -97,9 +99,5 @@ const style = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  text: {
-    color: "#fff",
-    fontSize: 16,
   },
 });
