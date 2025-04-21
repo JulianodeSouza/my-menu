@@ -12,7 +12,7 @@ export const ButtonNavigatePrimary = forwardRef<View, IButtonLinkProps>(
       <Link
         href={href}
         style={[styles.link, linkProps.style, { backgroundColor: theme.primary }]}
-        {...{ linkProps }}>
+        {...linkProps}>
         <Text style={styles.linkText}>{title}</Text>
       </Link>
     );
