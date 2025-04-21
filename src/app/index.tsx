@@ -2,7 +2,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { Divider, FAB } from "@rneui/base";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, StatusBar, StyleSheet, Text, useColorScheme, View } from "react-native";
+import { ScrollView, StatusBar, StyleSheet, useColorScheme, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "theme";
 import { Container } from "~/components/Container";
@@ -86,7 +86,6 @@ export default function Home() {
   };
 
   const showModalFinishPurchase = () => {
-    let haveItemUnchecked = false;
     openModalConfirmation(
       "Deseja finalizar a compra? Todos os itens serão removidos e o valor será zerado",
       () => {

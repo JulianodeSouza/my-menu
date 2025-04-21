@@ -1,6 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
-import { useCategoryDatabase } from "~/db/categoryDatabase";
 import { useMeasuredUnitDatabase } from "~/db/measuredUnit";
 
 export default function SelectMeasuredUnits({ value, handleChange }) {

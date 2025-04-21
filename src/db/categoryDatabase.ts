@@ -30,8 +30,19 @@ export function useCategoryDatabase() {
     }
   }
 
+  async function removeCategory(idCategory: number) {
+    const statement = await database.prepareAsync("delete from categories where idCategory = ?");
+
+    try {
+      await statement.executeAsync([idCategory]);
+    } catch (e) {
+      throw new AppError("Erro ao remover categoria", e);
+    }
+  }
+
   return {
     create,
     listAllCategories,
+    removeCategory,
   };
 }
