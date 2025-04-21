@@ -51,8 +51,8 @@ export default function AddItems() {
     <Container>
       <HeaderScreen headerShown={false} />
 
-      <ScreenContent style={sytle.container}>
-        <Card containerStyle={sytle.card}>
+      <ScreenContent style={sytles.container}>
+        <Card containerStyle={sytles.card}>
           <Card.Title>Informe a categoria</Card.Title>
           <Card.Divider />
 
@@ -63,7 +63,7 @@ export default function AddItems() {
   );
 }
 
-const sytle = StyleSheet.create({
+const sytles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",

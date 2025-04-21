@@ -31,7 +31,7 @@ const geralReducer = createSlice({
     },
 
     resetRefreshCategories(state) {
-      state.refreshCategories = initialState.refreshItens;
+      state.refreshCategories = initialState.refreshCategories;
     },
   },
 });
