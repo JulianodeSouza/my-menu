@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CheckBox, Divider, Text } from "@rneui/base";
 import { useState } from "react";
 import { Appearance, ColorSchemeName, StyleSheet, useColorScheme } from "react-native";
+import { ButtonNavigatePrimary } from "~/components/ButtonNavigatePrimary";
 import { ButtonPrimary } from "~/components/ButtonPrimary";
 import { ButtonTextSecondary } from "~/components/ButtonTextSecondary";
 import { Container } from "~/components/Container";
@@ -47,10 +48,9 @@ export default function Settings() {
             }}
           />
 
-          {/* <Divider /> */}
-          {/* <TextComponent style={styles.titleSection}>Lista de mercado</TextComponent>
-
-          <ButtonPrimary title="Categorias" style={styles.button} /> */}
+          <Divider />
+          <TextComponent style={styles.titleSection}>Lista de mercado</TextComponent>
+          <ButtonNavigatePrimary href="/categories" title="Categorias" style={styles.button} />
         </ScreenContent>
       </Container>
 

@@ -4,23 +4,20 @@ import * as yup from "yup";
 import { ButtonPrimary } from "~/components/ButtonPrimary";
 import { ButtonTextSecondary } from "~/components/ButtonTextSecondary";
 import { Input } from "~/components/Input";
-import SelectCategories from "~/components/SelectCategories";
-import { IListPurchase } from "~/types/listPurchase";
-import SelectMeasuredUnits from "./SelectMeasuredUnits";
+import { ICategories } from "~/types/categories";
 
 type PropsForm = {
   save: (values: any) => void;
-  handleClose: () => void;
+  navigateBack: () => void;
   isEdit?: boolean;
-  item?: IListPurchase;
+  item?: ICategories;
 };
 
-export default function FormListPurchase({ save, handleClose }: PropsForm) {
-  const initialState = { name: "", category: "1", quantity: "", measuredUnit: "1" };
+export default function FormCategories({ save, navigateBack }: PropsForm) {
+  const initialState = { name: "" };
 
   const Schema = yup.object().shape({
-    name: yup.string().required("Informe o nome do produto"),
-    quantity: yup.string().required("Informe a quantidade de itens"),
+    name: yup.string().required("Informe o nome da categoria"),
   });
 
   const formik = useFormik({
@@ -35,35 +32,12 @@ export default function FormListPurchase({ save, handleClose }: PropsForm) {
   return (
     <>
       <Input
-        placeholder="Produto *"
+        placeholder="Categoria *"
         onChangeText={formik.handleChange("name")}
         value={formik.values.name || ""}
         error={formik.touched.name && Boolean(formik.errors.name)}
         textError={formik.errors.name}
         keyboardType="default"
-      />
-
-      <Input
-        placeholder="Quantidade *"
-        onChangeText={formik.handleChange("quantity")}
-        value={formik.values.quantity || ""}
-        keyboardType="numeric"
-        error={formik.touched.quantity && Boolean(formik.errors.quantity)}
-        textError={formik.errors.quantity}
-      />
-
-      <SelectCategories
-        value={formik.values.category}
-        handleChange={(value) => {
-          formik.setFieldValue("category", value);
-        }}
-      />
-
-      <SelectMeasuredUnits
-        value={formik.values.measuredUnit}
-        handleChange={(value) => {
-          formik.setFieldValue("measuredUnit", value);
-        }}
       />
 
       <ButtonPrimary
@@ -76,7 +50,7 @@ export default function FormListPurchase({ save, handleClose }: PropsForm) {
         style={sytle.buttons}
         title="Voltar"
         onPress={() => {
-          handleClose();
+          navigateBack();
         }}
       />
     </>
