@@ -4,11 +4,12 @@ import { SQLiteProvider } from "expo-sqlite";
 import { useCallback, useEffect } from "react";
 import { Appearance, ColorSchemeName } from "react-native";
 import { Provider as ReduxProvider } from "react-redux";
-import { store } from "~/store";
-import { initializeDatabase } from "../db/initializeDatabase";
+import { ApiProvider } from "~/ApiContext";
+import { ModalConfirmation } from "~/components/Dialogs/DialogConfirmation";
 import { Toast } from "~/components/Toast";
 import { ModalProvider } from "~/contexts/DialogContext";
-import { ModalConfirmation } from "~/components/Dialogs/DialogConfirmation";
+import { initializeDatabase } from "~/db/initializeDatabase";
+import { store } from "~/store";
 
 export default function Layout() {
   const getTheme = useCallback(async () => {
@@ -27,10 +28,11 @@ export default function Layout() {
     <ModalProvider>
       <SQLiteProvider databaseName="myMenu.db" onInit={initializeDatabase} useSuspense>
         <ReduxProvider store={store}>
-          <Stack />
+          <ApiProvider>
+            <Stack />
 
-          <Toast />
-
+            <Toast />
+          </ApiProvider>
           <ModalConfirmation />
         </ReduxProvider>
       </SQLiteProvider>

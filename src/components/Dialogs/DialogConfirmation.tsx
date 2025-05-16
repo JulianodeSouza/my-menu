@@ -1,11 +1,10 @@
-import React from "react";
-import { StyleSheet, useColorScheme, View } from "react-native";
 import { Dialog } from "@rneui/base";
-import { TextComponent } from "../Text";
-import { ButtonPrimary } from "../ButtonPrimary";
-import { ButtonTextSecondary } from "../ButtonTextSecondary";
-import { useModalConfirmation } from "~/contexts/DialogContext";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import { darkTheme, lightTheme } from "theme";
+import { useModalConfirmation } from "~/contexts/DialogContext";
+import { ButtonPrimary } from "../Buttons/ButtonPrimary";
+import { ButtonTextSecondary } from "../Buttons/ButtonTextSecondary";
+import { TextComponent } from "../Text";
 
 export const ModalConfirmation = () => {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
