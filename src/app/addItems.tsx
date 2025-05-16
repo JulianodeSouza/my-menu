@@ -1,18 +1,18 @@
 import { Card } from "@rneui/base";
 import { useNavigation } from "expo-router";
-import { Alert, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
+import { useApi } from "~/ApiContext";
 import { Container } from "~/components/Container";
 import FormListPurchase from "~/components/FormListPurchase";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
-import { useListPurchaseDatabase } from "~/db/listPurchaseDatabase";
 import { setInfoToast, setRefreshItens } from "~/store/reducers/geral";
 import { formatDecimal } from "~/utils/stringUtils";
 
 export default function AddItems() {
+  const { postApi } = useApi();
   const dispatch = useDispatch();
-  const purchaseListDatabase = useListPurchaseDatabase();
   const navigation = useNavigation();
 
   const handleClose = () => {
@@ -27,28 +27,17 @@ export default function AddItems() {
       measuredUnit: values.measuredUnit,
     };
 
-    await purchaseListDatabase
-      .create(data)
-      .then(() => {
-        dispatch(
-          setInfoToast({
-            open: true,
-            message: "Item adicionado com sucesso!",
-            type: "success",
-          })
-        );
+    await postApi("list-supermarket", data);
 
-        dispatch(setRefreshItens(true));
+    dispatch(
+      setInfoToast({
+        open: true,
+        message: "Item adicionado com sucesso!",
+        type: "success",
       })
-      .catch(() => {
-        dispatch(
-          setInfoToast({
-            open: true,
-            message: "Houve um erro ao adicionar o item!",
-            type: "error",
-          })
-        );
-      });
+    );
+
+    dispatch(setRefreshItens(true));
   };
 
   return (
