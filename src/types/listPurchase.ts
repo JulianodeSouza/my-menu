@@ -14,3 +14,8 @@ export type IItemChecked = {
   totalCaught: number;
   amount: number;
 };
+
+export type IListPurchaseView = {
+  category: string;
+  items: IListPurchase[];
+};

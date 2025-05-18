@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 const ModalContext = createContext(null);
 
 export const ModalProvider = ({ children }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [message, setMessage] = useState("");
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
   const [onConfirm, setOnConfirm] = useState(() => () => {});
 
   const openModalConfirmation = (message, confirmCallback) => {

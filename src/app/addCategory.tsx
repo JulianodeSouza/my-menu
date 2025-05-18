@@ -2,17 +2,17 @@ import { Card } from "@rneui/base";
 import { useNavigation } from "expo-router";
 import { StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
+import { useApi } from "~/ApiContext";
 import { Container } from "~/components/Container";
 import FormCategories from "~/components/FormCategories";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
-import { useCategoryDatabase } from "~/db/categoryDatabase";
 import { setInfoToast, setRefreshCategories } from "~/store/reducers/geral";
 
 export default function AddItems() {
   const dispatch = useDispatch();
-  const categoriesDatabase = useCategoryDatabase();
   const navigation = useNavigation();
+  const { postApi } = useApi();
 
   const navigateBack = () => {
     navigation.goBack();
@@ -23,28 +23,17 @@ export default function AddItems() {
       name: values.name.trim(),
     };
 
-    await categoriesDatabase
-      .create(data)
-      .then(() => {
-        dispatch(
-          setInfoToast({
-            open: true,
-            message: "Categoria adicionada com sucesso!",
-            type: "success",
-          })
-        );
+    await postApi("", data);
 
-        dispatch(setRefreshCategories(true));
+    dispatch(
+      setInfoToast({
+        open: true,
+        message: "Categoria adicionada com sucesso!",
+        type: "success",
       })
-      .catch(() => {
-        dispatch(
-          setInfoToast({
-            open: true,
-            message: "Houve um erro ao adicionar a categoria!",
-            type: "error",
-          })
-        );
-      });
+    );
+
+    dispatch(setRefreshCategories(true));
   };
 
   return (

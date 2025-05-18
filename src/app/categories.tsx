@@ -5,12 +5,12 @@ import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, useColorScheme, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "theme";
+import { useApi } from "~/ApiContext";
 import { Container } from "~/components/Container";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
 import { TextComponent } from "~/components/Text";
 import { useModalConfirmation } from "~/contexts/DialogContext";
-import { useCategoryDatabase } from "~/db/categoryDatabase";
 import { resetRefreshCategories, setInfoToast } from "~/store/reducers/geral";
 
 export default function AddItems() {
@@ -18,9 +18,9 @@ export default function AddItems() {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
   const { geral } = useSelector((state: any) => state);
   const { openModalConfirmation } = useModalConfirmation();
+  const { getApi, deleteApi } = useApi();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const categoryDatabase = useCategoryDatabase();
 
   const showDialogToRemove = (idCategory: number) => {
     openModalConfirmation("Deseja remover essa categoria?", async () => {
@@ -29,32 +29,21 @@ export default function AddItems() {
   };
 
   const remove = async (idCategory: number) => {
-    await categoryDatabase
-      .removeCategory(idCategory)
-      .then(() => {
-        dispatch(
-          setInfoToast({
-            open: true,
-            message: "Categoria removida com sucesso!",
-            type: "success",
-          })
-        );
-        setLoading(true);
+    await deleteApi(`categories/${idCategory}`);
+
+    dispatch(
+      setInfoToast({
+        open: true,
+        message: "Categoria removida com sucesso!",
+        type: "success",
       })
-      .catch(() => {
-        dispatch(
-          setInfoToast({
-            open: true,
-            message: "Houve um erro ao remover o item. Por favor, tente novamente.",
-            type: "error",
-          })
-        );
-      });
+    );
+    setLoading(true);
   };
 
   useEffect(() => {
     const loadCategories = async () => {
-      const result = await categoryDatabase.listAllCategories();
+      const result = await getApi("categories");
       setCategories(result);
     };
 

@@ -1,8 +1,8 @@
 import { useFormik } from "formik";
 import { StyleSheet } from "react-native";
 import * as yup from "yup";
-import { ButtonPrimary } from "~/components/ButtonPrimary";
-import { ButtonTextSecondary } from "~/components/ButtonTextSecondary";
+import { ButtonPrimary } from "~/components/Buttons/ButtonPrimary";
+import { ButtonTextSecondary } from "~/components/Buttons/ButtonTextSecondary";
 import { Input } from "~/components/Input";
 import SelectCategories from "~/components/SelectCategories";
 import { IListPurchase } from "~/types/listPurchase";
