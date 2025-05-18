@@ -1,21 +1,17 @@
 {
   "build": {
+    "production": {
+      "node": "18.18.0",
+      "buildType": "apk"
+    },
     "preview": {
-      "android": {
-        "buildType": "apk"
-      }
-    },
-    "preview2": {
-      "android": {
-        "gradleCommand": ":app:assembleRelease"
-      }
-    },
-    "preview3": {
-      "developmentClient": true
-    },
-    "preview4": {
+      "extends": "production",
       "distribution": "internal"
     },
-    "production": {}
+    "development": {
+      "extends": "production",
+      "developmentClient": true,
+      "distribution": "internal"
+    }
   }
 }
