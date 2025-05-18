@@ -2,7 +2,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { Divider, FAB } from "@rneui/base";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, StatusBar, StyleSheet, useColorScheme, View } from "react-native";
+import { StatusBar, StyleSheet, useColorScheme, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "theme";
 import { useApi } from "~/ApiContext";
@@ -10,11 +10,18 @@ import { Container } from "~/components/Container";
 import ModalMarkItemList from "~/components/ModalMarkItemList";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
+import ScrollContent from "~/components/ScrollContent";
 import { TextComponent } from "~/components/Text";
 import { TextTouchable } from "~/components/TextTouchable";
 import { useModalConfirmation } from "~/contexts/DialogContext";
 import { resetRefresh, setInfoToast } from "~/store/reducers/geral";
+import { IListPurchaseView } from "~/types/listPurchase";
 import { formatMonetary } from "~/utils/stringUtils";
+
+type IDialog = {
+  open: boolean;
+  item: IListPurchaseView | {};
+};
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -22,10 +29,10 @@ export default function Home() {
   const { geral } = useSelector((state: any) => state);
   const { openModalConfirmation } = useModalConfirmation();
   const { getApi, deleteApi } = useApi();
-  const [items, setItems] = useState([]);
-  const [loadItems, setLoadItems] = useState(false);
-  const [infoDialog, setInfoDialog] = useState({ open: false, item: {} });
-  const [totalPurchase, setTotalPurchase] = useState(0);
+  const [items, setItems] = useState<IListPurchaseView[]>([]);
+  const [loadItems, setLoadItems] = useState<boolean>(false);
+  const [infoDialog, setInfoDialog] = useState<IDialog>({ open: false, item: {} });
+  const [totalPurchase, setTotalPurchase] = useState<number>(0);
 
   const remove = async (idItem: number) => {
     deleteApi(`list-supermarket/${idItem}`);
@@ -76,31 +83,6 @@ export default function Home() {
   useEffect(() => {
     const loadData = async () => {
       const results = await getApi("list-supermarket");
-
-      console.log("RESULTS", results);
-
-      const itemsByCategory = [];
-      for (const result of results) {
-        const categoryAlredayExist = itemsByCategory.find(
-          (category) => category.category === result.category
-        );
-
-        if (!categoryAlredayExist) {
-          const itemList = {
-            category: result.category,
-            items: [result],
-          };
-
-          itemsByCategory.push(itemList);
-        } else {
-          const index = itemsByCategory.findIndex(
-            (category) => category.category === result.category
-          );
-
-          itemsByCategory[index].items.push(result);
-        }
-      }
-
       setItems(results);
     };
 
@@ -131,7 +113,7 @@ export default function Home() {
         </View>
 
         <ScreenContent style={styles.containerList}>
-          <ScrollView style={{ flex: 1, height: "90%" }} showsVerticalScrollIndicator={false}>
+          <ScrollContent>
             {items.map((item) => (
               <View key={item.category}>
                 <TextComponent style={styles.title}>{item.category}</TextComponent>
@@ -159,7 +141,7 @@ export default function Home() {
                 ))}
               </View>
             ))}
-          </ScrollView>
+          </ScrollContent>
         </ScreenContent>
 
         <ScreenContent style={{ justifyContent: "flex-end", maxHeight: "20%" }}>
