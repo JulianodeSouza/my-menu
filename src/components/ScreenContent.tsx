@@ -1,4 +1,4 @@
-import { StyleSheet, View, ViewProps } from 'react-native';
+import { StyleSheet, View, ViewProps } from "react-native";
 
 type ScreenContentProps = {
   children: React.ReactNode;
@@ -18,6 +18,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

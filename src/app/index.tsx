@@ -1,6 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import { Divider, FAB } from "@rneui/base";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { StatusBar, StyleSheet, useColorScheme, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +24,7 @@ type IDialog = {
 };
 
 export default function Home() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
   const { geral } = useSelector((state: any) => state);
@@ -157,9 +158,14 @@ export default function Home() {
               </View>
             </TextTouchable>
 
-            <Link href={{ pathname: "/addItems" }} asChild>
-              <FAB style={styles.addButton} icon={{ name: "add", color: "white" }} color="green" />
-            </Link>
+            <FAB
+              style={styles.addButton}
+              icon={{ name: "add", color: "white" }}
+              color="green"
+              onPress={() => {
+                router.push("/addItems");
+              }}
+            />
           </View>
         </ScreenContent>
       </Container>

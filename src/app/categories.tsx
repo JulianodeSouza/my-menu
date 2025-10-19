@@ -1,8 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Divider, FAB } from "@rneui/base";
-import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, useColorScheme, View } from "react-native";
+import { StyleSheet, TouchableOpacity, useColorScheme, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "theme";
 import { useApi } from "~/ApiContext";
@@ -13,10 +12,10 @@ import { TextComponent } from "~/components/Text";
 import { useModalConfirmation } from "~/contexts/DialogContext";
 import { resetRefreshCategories, setInfoToast } from "~/store/reducers/geral";
 
-export default function AddItems() {
+export default function Categories() {
   const dispatch = useDispatch();
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
-  const { geral } = useSelector((state: any) => state);
+  const geral = useSelector((state: any) => state.geral);
   const { openModalConfirmation } = useModalConfirmation();
   const { getApi, deleteApi } = useApi();
   const [categories, setCategories] = useState([]);
@@ -63,41 +62,39 @@ export default function AddItems() {
       <HeaderScreen headerShown={true} title="Categorias" />
 
       <ScreenContent style={styles.containerList}>
-        <ScrollView style={{ flex: 1, height: "90%" }} showsVerticalScrollIndicator={false}>
-          {categories.length === 0 && <TextComponent>Nenhuma categoria encontrada</TextComponent>}
+        {categories.length === 0 && (
+          <TextComponent style={styles.titleWithoutCategories}>
+            Nenhuma categoria encontrada
+          </TextComponent>
+        )}
 
-          {categories.length > 0 && (
-            <>
-              {categories.map((category) => (
-                <View key={category.idCategory}>
-                  <View style={styles.rowCategory}>
-                    <TextComponent style={styles.title}>{category.name}</TextComponent>
+        {categories.length > 0 && (
+          <>
+            {categories.map((category) => (
+              <View key={category.idCategory}>
+                <View style={styles.rowCategory}>
+                  <TextComponent style={styles.title}>{category.name}</TextComponent>
 
-                    <View style={{ flexDirection: "row" }}>
-                      <TouchableOpacity
-                        onPress={() => {
-                          showDialogToRemove(category.idCategory);
-                        }}>
-                        <MaterialIcons name="delete" size={30} color={theme.error} />
-                      </TouchableOpacity>
-                    </View>
+                  <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        showDialogToRemove(category.idCategory);
+                      }}>
+                      <MaterialIcons name="delete" size={30} color={theme.error} />
+                    </TouchableOpacity>
                   </View>
-
-                  <Divider />
                 </View>
-              ))}
-            </>
-          )}
-        </ScrollView>
+
+                <Divider />
+              </View>
+            ))}
+          </>
+        )}
       </ScreenContent>
 
-      <ScreenContent style={{ justifyContent: "flex-end", maxHeight: "20%" }}>
-        <View style={styles.footer}>
-          <Link href={{ pathname: "/addCategory" }} asChild>
-            <FAB style={styles.addButton} icon={{ name: "add", color: "white" }} color="green" />
-          </Link>
-        </View>
-      </ScreenContent>
+      <View style={styles.footer}>
+        <FAB style={styles.addButton} icon={{ name: "add", color: "white" }} color="green" />
+      </View>
     </Container>
   );
 }
@@ -106,6 +103,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
   },
+  titleWithoutCategories: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 24,
+    textAlign: "center",
+  },
   title: {
     fontSize: 20,
     fontWeight: "bold",
@@ -113,12 +117,16 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   footer: {
+    flex: 1,
+    alignItems: "flex-end",
     flexDirection: "row",
     justifyContent: "flex-end",
   },
   addButton: {
-    marginBottom: 35,
-    marginRight: 15,
+    marginBottom: 15,
+    marginRight: 5,
+    justifyContent: "flex-end",
+    maxHeight: "20%",
   },
   rowCategory: {
     display: "flex",
