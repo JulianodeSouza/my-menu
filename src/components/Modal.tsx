@@ -1,15 +1,15 @@
-import { Overlay, OverlayProps } from "@rneui/themed";
+import { Portal, Modal as PaperModal } from "react-native-paper";
 import { ReactNode } from "react";
-import { StyleSheet, useColorScheme } from "react-native";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import { darkTheme, lightTheme } from "theme";
 
 type ModalProps = {
   children: ReactNode;
   visible: boolean;
   setVisible: any;
-} & Partial<OverlayProps>;
+};
 
-export const Modal = ({ children, visible, setVisible, ...rest }: ModalProps) => {
+export const Modal = ({ children, visible, setVisible }: ModalProps) => {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
 
   const toggleOverlay = () => {
@@ -17,18 +17,21 @@ export const Modal = ({ children, visible, setVisible, ...rest }: ModalProps) =>
   };
 
   return (
-    <Overlay
-      isVisible={visible}
-      onBackdropPress={toggleOverlay}
-      overlayStyle={[styles.overlay, { backgroundColor: theme.background }, rest.style]}>
-      {children}
-    </Overlay>
+    <Portal>
+      <PaperModal
+        visible={visible}
+        onDismiss={toggleOverlay}
+        contentContainerStyle={[styles.modal, { backgroundColor: theme.background }]}>
+        {children}
+      </PaperModal>
+    </Portal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
+  modal: {
     padding: 20,
-    width: "80%",
+    margin: 20,
+    borderRadius: 8,
   },
 });

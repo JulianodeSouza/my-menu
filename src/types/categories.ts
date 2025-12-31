@@ -1,4 +1,4 @@
 export type ICategories = {
-  idCategory: number;
+  id_category: number;
   name: string;
 };

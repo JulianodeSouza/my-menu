@@ -40,7 +40,7 @@ export function useListPurchaseDatabase() {
       c.name as category,
       mu.name as measuredUnit
       from list_purchase lp
-      inner join categories c on lp.category = c.idCategory
+      inner join categories c on lp.category = c.id_category
       inner join measured_unit mu on lp.measuredUnit = mu.id`;
 
       const result = await database.getAllAsync<IListPurchase>(sql);
@@ -57,7 +57,7 @@ export function useListPurchaseDatabase() {
       select lp.*,
       c.name as category 
       from list_purchase lp
-      inner join categories c on lp.category = c.idCategory
+      inner join categories c on lp.category = c.id_category
       where lp.id = ?`;
 
       const result = await database.getFirstAsync<IListPurchase>(sql, [id]);

@@ -8,28 +8,35 @@ import { darkTheme, lightTheme } from "theme";
 
 export const Toast = () => {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
-  const { geral } = useSelector((state: any) => state);
+  const geral = useSelector((state: any) => state.geral);
   const dispatch = useDispatch();
   const bottom = useRef(new Animated.Value(-80)).current;
   const opacity = useRef(new Animated.Value(1)).current;
 
   const handleClose = () => {
-    dispatch(setInfoToast({ open: false }));
+    dispatch(setInfoToast({ open: false, message: "", type: "" }));
   };
 
   function showToast() {
+    // Reseta os valores para o estado inicial
+    bottom.setValue(-80);
+    opacity.setValue(1);
+
     Animated.timing(bottom, {
       toValue: 20,
-      duration: 3000,
+      duration: 300,
       useNativeDriver: false,
     }).start(() => {
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 5000,
-        useNativeDriver: false,
-      }).start(() => {
-        handleClose();
-      });
+      // Aguarda 3 segundos antes de fechar
+      setTimeout(() => {
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: false,
+        }).start(() => {
+          handleClose();
+        });
+      }, 3000);
     });
   }
 
@@ -52,7 +59,9 @@ export const Toast = () => {
   };
 
   useEffect(() => {
-    showToast();
+    if (geral.infoToast.open) {
+      showToast();
+    }
   }, [geral.infoToast.open]);
 
   return (

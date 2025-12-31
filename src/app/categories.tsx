@@ -1,16 +1,17 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Divider, FAB } from "@rneui/base";
+import { Divider } from "react-native-paper";
 import { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, useColorScheme, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "theme";
 import { useApi } from "~/ApiContext";
+import FloatingButton from "~/components/Buttons/FloatingButton";
 import { Container } from "~/components/Container";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
 import { TextComponent } from "~/components/Text";
 import { useModalConfirmation } from "~/contexts/DialogContext";
-import { resetRefreshCategories, setInfoToast } from "~/store/reducers/geral";
+import { setInfoToast } from "~/store/reducers/geral";
 
 export default function Categories() {
   const dispatch = useDispatch();
@@ -21,14 +22,14 @@ export default function Categories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const showDialogToRemove = (idCategory: number) => {
+  const showDialogToRemove = (id_category: number) => {
     openModalConfirmation("Deseja remover essa categoria?", async () => {
-      remove(idCategory);
+      remove(id_category);
     });
   };
 
-  const remove = async (idCategory: number) => {
-    await deleteApi(`categories/${idCategory}`);
+  const remove = async (id_category: number) => {
+    await deleteApi(`categories/${id_category}`);
 
     dispatch(
       setInfoToast({
@@ -49,7 +50,6 @@ export default function Categories() {
     if (loading) {
       setLoading(false);
       loadCategories();
-      dispatch(resetRefreshCategories());
     }
   }, [loading]);
 
@@ -71,14 +71,14 @@ export default function Categories() {
         {categories.length > 0 && (
           <>
             {categories.map((category) => (
-              <View key={category.idCategory}>
+              <View key={category.id_category}>
                 <View style={styles.rowCategory}>
                   <TextComponent style={styles.title}>{category.name}</TextComponent>
 
                   <View style={{ flexDirection: "row" }}>
                     <TouchableOpacity
                       onPress={() => {
-                        showDialogToRemove(category.idCategory);
+                        showDialogToRemove(category.id_category);
                       }}>
                       <MaterialIcons name="delete" size={30} color={theme.error} />
                     </TouchableOpacity>
@@ -93,7 +93,9 @@ export default function Categories() {
       </ScreenContent>
 
       <View style={styles.footer}>
-        <FAB style={styles.addButton} icon={{ name: "add", color: "white" }} color="green" />
+        <View style={styles.addButton}>
+          <FloatingButton onPress={() => {}} />
+        </View>
       </View>
     </Container>
   );

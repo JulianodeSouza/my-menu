@@ -1,44 +1,37 @@
-import { Dialog } from "@rneui/base";
+import { Portal, Dialog, Button, Text } from "react-native-paper";
 import { StyleSheet, useColorScheme, View } from "react-native";
 import { darkTheme, lightTheme } from "theme";
 import { useModalConfirmation } from "~/contexts/DialogContext";
-import { ButtonPrimary } from "../Buttons/ButtonPrimary";
-import { ButtonTextSecondary } from "../Buttons/ButtonTextSecondary";
-import { TextComponent } from "../Text";
 
 export const ModalConfirmation = () => {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
   const { isVisible, message, onConfirm, closeModalConfirmation } = useModalConfirmation();
 
   return (
-    <Dialog
-      isVisible={isVisible}
-      onBackdropPress={closeModalConfirmation}
-      overlayStyle={{ backgroundColor: theme.background }}>
-      <Dialog.Title titleStyle={[styles.title, { color: theme.text }]} title="Atenção" />
-      <TextComponent style={styles.message}>{message}</TextComponent>
-
-      <Dialog.Actions>
-        <View style={styles.actionsButtons}>
-          <View
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center",
-            }}>
-            <ButtonTextSecondary title="Cancelar" onPress={closeModalConfirmation} />
-          </View>
-
-          <ButtonPrimary
-            title="Confirmar"
+    <Portal>
+      <Dialog
+        visible={isVisible}
+        onDismiss={closeModalConfirmation}
+        style={{ backgroundColor: theme.background }}>
+        <Dialog.Title style={[styles.title, { color: theme.text }]}>Atenção</Dialog.Title>
+        <Dialog.Content>
+          <Text style={[styles.message, { color: theme.text }]}>{message}</Text>
+        </Dialog.Content>
+        <Dialog.Actions style={styles.actionsButtons}>
+          <Button textColor={theme.textSecondary} onPress={closeModalConfirmation}>
+            Cancelar
+          </Button>
+          <Button
+            mode="contained"
             onPress={() => {
               onConfirm();
               closeModalConfirmation();
-            }}
-          />
-        </View>
-      </Dialog.Actions>
-    </Dialog>
+            }}>
+            Confirmar
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
   );
 };
 
@@ -50,12 +43,11 @@ const styles = StyleSheet.create({
   },
   actionsButtons: {
     flexDirection: "row",
-    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    paddingBottom: 16,
   },
   title: {
-    textAlign: "center",
-  },
-  cancel: {
     textAlign: "center",
   },
 });

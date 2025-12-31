@@ -1,44 +1,33 @@
-import { Button } from "@rneui/base";
-import { forwardRef } from "react";
-import { StyleSheet, Text, TouchableOpacityProps, useColorScheme, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, useColorScheme, ViewStyle } from "react-native";
 import { darkTheme, lightTheme } from "theme";
-
 
 type ButtonProps = {
   title: string;
-  icon?: React.ReactNode;
-} & TouchableOpacityProps;
+  iconStart?: React.ReactNode;
+  iconEnd?: React.ReactNode;
+  onPress?: () => void;
+  style?: ViewStyle;
+};
 
-export const ButtonText = forwardRef<View, ButtonProps>(({ title, icon, ...buttonProps }, ref) => {
+export const ButtonText = ({ title, iconStart, iconEnd, onPress, style }: ButtonProps) => {
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
 
   return (
-    <Button
-      type="clear"
-      {...buttonProps}
-      style={[styles.button, buttonProps.style, { backgroundColor: theme.primary }]}>
-      {icon ? icon : null}
-
+    <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
+      {iconStart}
       <Text style={[styles.buttonText, { color: theme.text }]}>{title}</Text>
-    </Button>
+      {iconEnd}
+    </TouchableOpacity>
   );
-});
+};
 
 const styles = StyleSheet.create({
   button: {
     alignItems: "center",
     borderRadius: 24,
-    elevation: 5,
     flexDirection: "row",
     justifyContent: "center",
     padding: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      height: 2,
-      width: 0,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
   buttonText: {
     fontSize: 16,

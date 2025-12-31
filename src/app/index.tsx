@@ -1,11 +1,13 @@
 import Feather from "@expo/vector-icons/Feather";
-import { Divider, FAB } from "@rneui/base";
+import { useFocusEffect } from "@react-navigation/native";
 import { Link, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StatusBar, StyleSheet, useColorScheme, View } from "react-native";
+import { Divider } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "theme";
 import { useApi } from "~/ApiContext";
+import FloatingButton from "~/components/Buttons/FloatingButton";
 import { Container } from "~/components/Container";
 import ModalMarkItemList from "~/components/ModalMarkItemList";
 import { ScreenContent } from "~/components/ScreenContent";
@@ -14,7 +16,7 @@ import ScrollContent from "~/components/ScrollContent";
 import { TextComponent } from "~/components/Text";
 import { TextTouchable } from "~/components/TextTouchable";
 import { useModalConfirmation } from "~/contexts/DialogContext";
-import { resetRefresh, setInfoToast } from "~/store/reducers/geral";
+import { setInfoToast } from "~/store/reducers/geral";
 import { IListPurchaseView } from "~/types/listPurchase";
 import { formatMonetary } from "~/utils/stringUtils";
 
@@ -27,7 +29,6 @@ export default function Home() {
   const router = useRouter();
   const dispatch = useDispatch();
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
-  const { geral } = useSelector((state: any) => state);
   const { openModalConfirmation } = useModalConfirmation();
   const { getApi, deleteApi } = useApi();
   const [items, setItems] = useState<IListPurchaseView[]>([]);
@@ -90,13 +91,14 @@ export default function Home() {
     if (loadItems) {
       setLoadItems(false);
       loadData();
-      dispatch(resetRefresh());
     }
   }, [loadItems]);
 
-  useEffect(() => {
-    setLoadItems(true);
-  }, [geral.refreshItens]);
+  useFocusEffect(
+    useCallback(() => {
+      setLoadItems(true);
+    }, [])
+  );
 
   return (
     <>
@@ -115,33 +117,37 @@ export default function Home() {
 
         <ScreenContent style={styles.containerList}>
           <ScrollContent>
-            {items.map((item) => (
-              <View key={item.category}>
-                <TextComponent style={styles.title}>{item.category}</TextComponent>
+            {items.length > 0 && (
+              <>
+                {items.map((item) => (
+                  <View key={item.category}>
+                    <TextComponent style={styles.title}>{item.category}</TextComponent>
 
-                <Divider />
-                {item.items.map((item) => (
-                  <View key={item.id} style={styles.list}>
-                    <TextTouchable
-                      onLongPress={() => {
-                        if (!item.checked) {
-                          showModalRemoveItem(item.id);
-                        }
-                      }}
-                      onPress={() => {
-                        setInfoDialog({ open: true, item });
-                      }}>
-                      <View>
-                        <TextComponent
-                          style={item.checked ? styles.itemChecked : styles.textItemList}>
-                          {item.name} - {item.quantity} {item.measuredUnit}
-                        </TextComponent>
+                    <Divider />
+                    {item.items.map((item) => (
+                      <View key={item.id} style={styles.list}>
+                        <TextTouchable
+                          onLongPress={() => {
+                            if (!item.checked) {
+                              showModalRemoveItem(item.id);
+                            }
+                          }}
+                          onPress={() => {
+                            setInfoDialog({ open: true, item });
+                          }}>
+                          <View>
+                            <TextComponent
+                              style={item.checked ? styles.itemChecked : styles.textItemList}>
+                              {item.name} - {item.quantity} {item.measuredUnit}
+                            </TextComponent>
+                          </View>
+                        </TextTouchable>
                       </View>
-                    </TextTouchable>
+                    ))}
                   </View>
                 ))}
-              </View>
-            ))}
+              </>
+            )}
           </ScrollContent>
         </ScreenContent>
 
@@ -158,9 +164,8 @@ export default function Home() {
               </View>
             </TextTouchable>
 
-            <FAB
+            <FloatingButton
               style={styles.addButton}
-              icon={{ name: "add", color: "white" }}
               color="green"
               onPress={() => {
                 router.push("/addItems");

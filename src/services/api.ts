@@ -1,86 +1,60 @@
 import axios from "axios";
+import Constants from "expo-constants";
 
-export async function get(url: string, params?: any): Promise<any> {
-  const promise = new Promise((resolve, reject) => {
-    const headers = getHeaders();
+const axiosInstance = axios.create({
+  timeout: 30000,
+  baseURL: getUrlBase(),
+  headers: getHeaders(),
+});
 
-    if (params) {
-      params = "?" + new URLSearchParams(params).toString();
-    } else {
-      params = "";
-    }
+export async function get(endpoint: string, params?: any): Promise<any> {
+  let queryString = "";
 
-    axios
-      .get(getUrlBase() + url + params, headers)
-      .then((response) => {
-        resolve(response.data);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
+  if (params) {
+    queryString = "?" + new URLSearchParams(params).toString();
+  }
 
-  return promise;
+  const fullUrl = endpoint + queryString;
+  const result = await axiosInstance.get(fullUrl);
+
+  return result.data;
 }
 
-export async function post(url: string, data?: any): Promise<any> {
-  const promise = new Promise((resolve, reject) => {
-    const headers = getHeaders();
-
-    axios
-      .post(getUrlBase() + url, data, headers)
-      .then((response) => {
-        resolve(response.data);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-
-  return promise;
+export async function post(endpoint: string, data?: any): Promise<any> {
+  const result = await axiosInstance.post(endpoint, data);
+  return result.data;
 }
 
-export async function put(url: string, data: any): Promise<any> {
-  const promise = new Promise((resolve, reject) => {
-    const headers = getHeaders();
+export async function put(endpoint: string, data: any): Promise<any> {
+  const result = await axiosInstance.put(endpoint, data);
 
-    axios
-      .put(getUrlBase() + url, data, headers)
-      .then((response) => {
-        resolve(response.data);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-
-  return promise;
+  return result.data;
 }
 
-export async function remove(url: string): Promise<any> {
-  const promise = new Promise((resolve, reject) => {
-    axios
-      .delete(url)
-      .then((response) => {
-        resolve(response.data);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-
-  return promise;
+export async function remove(endpoint: string): Promise<any> {
+  const result = await axiosInstance.delete(endpoint);
+  return result.data;
 }
 
 function getUrlBase(): string {
+  // Produção
   if (!__DEV__) {
-    return "";
+    return "http://44.221.138.71:21200/";
   }
 
-  return "http://10.0.2.2:21000/";
+  // Desenvolvimento - Obtém o IP do host do Expo
+  const debuggerHost = Constants.expoConfig?.hostUri?.split(":")[0];
+
+  if (debuggerHost) {
+    // Usa o IP detectado pelo Expo (funciona em dispositivos físicos e emuladores)
+    return `http://${debuggerHost}:21200/`;
+  }
+
+  // Fallback para emulador Android
+  return "http://10.0.2.2:21200/";
 }
 
-function getHeaders(): Object {
+function getHeaders(): Record<string, string> {
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
