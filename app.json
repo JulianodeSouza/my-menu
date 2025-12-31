@@ -9,12 +9,12 @@
       "output": "static",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-router", "expo-sqlite"],
+    "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true
     },
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {

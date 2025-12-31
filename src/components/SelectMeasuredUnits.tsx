@@ -1,15 +1,15 @@
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
-import { useMeasuredUnitDatabase } from "~/db/measuredUnit";
+import { useApi } from "~/ApiContext";
 
 export default function SelectMeasuredUnits({ value, handleChange }) {
+  const apiContext = useApi();
   const [measuredUnits, setMeasuredUnits] = useState([]);
   const [loading, setLoading] = useState(false);
-  const measuredUnitDatabase = useMeasuredUnitDatabase();
 
   useEffect(() => {
     const loadMeasuredUnits = async () => {
-      const result = await measuredUnitDatabase.listAllMeasuredUnits();
+      const result = await apiContext.getApi("measuredUnits");
       setMeasuredUnits(result);
     };
 

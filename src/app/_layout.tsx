@@ -1,9 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack } from "expo-router";
-import { SQLiteProvider } from "expo-sqlite";
 import { useCallback, useEffect } from "react";
-import { Appearance, ColorSchemeName } from "react-native";
+import { Appearance, ColorSchemeName, Platform, View, Text, StyleSheet } from "react-native";
 import { Provider as ReduxProvider } from "react-redux";
+import { PaperProvider } from "react-native-paper";
 import { ApiProvider } from "~/ApiContext";
 import { ModalConfirmation } from "~/components/Dialogs/DialogConfirmation";
 import { Toast } from "~/components/Toast";
@@ -25,8 +25,8 @@ export default function Layout() {
   }, [getTheme]);
 
   return (
-    <ModalProvider>
-      <SQLiteProvider databaseName="myMenu.db" onInit={initializeDatabase} useSuspense>
+    <PaperProvider>
+      <ModalProvider>
         <ReduxProvider store={store}>
           <ApiProvider>
             <Stack />
@@ -35,7 +35,7 @@ export default function Layout() {
           </ApiProvider>
           <ModalConfirmation />
         </ReduxProvider>
-      </SQLiteProvider>
-    </ModalProvider>
+      </ModalProvider>
+    </PaperProvider>
   );
 }

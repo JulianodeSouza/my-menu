@@ -1,9 +1,8 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Checkbox, Divider } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CheckBox, Divider, Text } from "@rneui/base";
 import { useState } from "react";
-import { Appearance, ColorSchemeName, StyleSheet, useColorScheme } from "react-native";
-import { ButtonNavigatePrimary } from "~/components/Buttons/ButtonNavigatePrimary";
+import { Appearance, ColorSchemeName, StyleSheet, useColorScheme, View } from "react-native";
 import { ButtonPrimary } from "~/components/Buttons/ButtonPrimary";
 import { ButtonTextSecondary } from "~/components/Buttons/ButtonTextSecondary";
 import { Container } from "~/components/Container";
@@ -11,10 +10,13 @@ import { Modal } from "~/components/Modal";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
 import { TextComponent } from "~/components/Text";
+import { ButtonNavigatePrimary } from "~/components/Buttons/ButtonNavigatePrimary";
+import { useRouter } from "expo-router";
 
 export default function Settings() {
   const [themeSelected, setThemeSelected] = useState(useColorScheme());
   const [infoDialog, setInfoDialog] = useState({ open: false });
+  const router = useRouter();
 
   const handleClose = () => {
     setInfoDialog({ open: false });
@@ -49,44 +51,34 @@ export default function Settings() {
           />
 
           <Divider />
-          <TextComponent style={styles.titleSection}>Lista de mercado</TextComponent>
-          <ButtonNavigatePrimary href="/categories" title="Categorias" style={styles.button} />
+          {/* <TextComponent style={styles.titleSection}>Lista de mercado</TextComponent> */}
+          <ButtonPrimary
+            title="Categorias"
+            style={styles.button}
+            onPress={() => {
+              router.push("/addCategory");
+            }}
+          />
         </ScreenContent>
       </Container>
 
       {infoDialog.open && (
-        <Modal visible={infoDialog.open} setVisible={setInfoDialog} style={styles.modalTheme}>
+        <Modal visible={infoDialog.open} setVisible={setInfoDialog}>
           <TextComponent style={styles.titleModalTheme}>Selecione o tema</TextComponent>
-
-          <CheckBox
-            title={
-              <Text>
-                Modo claro
-                <MaterialIcons name="light-mode" size={24} color="black" />
-              </Text>
-            }
-            checked={themeSelected === "light"}
-            onPress={() => changeColorScheme("light")}
-            checkedIcon="dot-circle-o"
-            uncheckedIcon="circle-o"
-          />
-          <CheckBox
-            title={
-              <Text>
-                Modo Escuro
-                <MaterialIcons
-                  style={{ alignContent: "center" }}
-                  name="dark-mode"
-                  size={24}
-                  color="black"
-                />
-              </Text>
-            }
-            checked={themeSelected === "dark"}
-            onPress={() => changeColorScheme("dark")}
-            checkedIcon="dot-circle-o"
-            uncheckedIcon="circle-o"
-          />
+          <View style={styles.checkboxRow}>
+            <Checkbox
+              status={themeSelected === "light" ? "checked" : "unchecked"}
+              onPress={() => changeColorScheme("light")}
+            />
+            <TextComponent>Modo Claro</TextComponent>
+          </View>
+          <View style={styles.checkboxRow}>
+            <Checkbox
+              status={themeSelected === "dark" ? "checked" : "unchecked"}
+              onPress={() => changeColorScheme("dark")}
+            />
+            <TextComponent>Modo Escuro</TextComponent>
+          </View>
 
           <ButtonTextSecondary title="Fechar" onPress={handleClose} />
         </Modal>
@@ -100,15 +92,17 @@ const styles = StyleSheet.create({
     minWidth: 300,
     margin: 15,
   },
-  modalTheme: {
-    width: "80%",
-    padding: 20,
-  },
   titleModalTheme: { textAlign: "center", fontSize: 24, padding: 10 },
   titleSection: {
     opacity: 0.5,
     fontSize: 14,
     fontWeight: "bold",
+    margin: 15,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
     margin: 15,
   },
 });

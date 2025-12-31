@@ -5,7 +5,7 @@ import AppError from "~/types/errors";
 export function useCategoryDatabase() {
   const database = useSQLiteContext();
 
-  async function create(data: Omit<ICategories, "idCategory">) {
+  async function create(data: Omit<ICategories, "id_category">) {
     // Prepara a query SQL para inserir um registro na tabela list_purchase
     const statement = await database.prepareAsync("insert into categories (name) values (:name)");
 
@@ -30,11 +30,11 @@ export function useCategoryDatabase() {
     }
   }
 
-  async function removeCategory(idCategory: number) {
-    const statement = await database.prepareAsync("delete from categories where idCategory = ?");
+  async function removeCategory(id_category: number) {
+    const statement = await database.prepareAsync("delete from categories where id_category = ?");
 
     try {
-      await statement.executeAsync([idCategory]);
+      await statement.executeAsync([id_category]);
     } catch (e) {
       throw new AppError("Erro ao remover categoria", e);
     }

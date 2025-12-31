@@ -4,7 +4,7 @@ import { ISystemConfigs } from "~/types/systemConfigs";
 export async function initializeDatabase(database: SQLiteDatabase) {
   await database.execAsync(`
     create table if not exists categories (
-      idCategory integer primary key autoincrement,
+      id_category integer primary key autoincrement,
       name text not null)`);
 
   await database.execAsync(`
@@ -17,7 +17,7 @@ export async function initializeDatabase(database: SQLiteDatabase) {
     totalCaught real,
     category integer not null,
     measuredUnit integer not null,
-    FOREIGN KEY (category) REFERENCES categories(idCategory) ON DELETE CASCADE,
+    FOREIGN KEY (category) REFERENCES categories(id_category) ON DELETE CASCADE,
     FOREIGN KEY (measuredUnit) REFERENCES measured_unit(id) ON DELETE CASCADE
     );`);
 

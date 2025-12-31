@@ -1,18 +1,20 @@
-import { Card } from "@rneui/base";
+import { Card, Divider, Text } from "react-native-paper";
 import { useNavigation } from "expo-router";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 import { useDispatch } from "react-redux";
+import { darkTheme, lightTheme } from "theme";
 import { useApi } from "~/ApiContext";
 import { Container } from "~/components/Container";
 import FormCategories from "~/components/FormCategories";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
-import { setInfoToast, setRefreshCategories } from "~/store/reducers/geral";
+import { setInfoToast } from "~/store/reducers/geral";
 
 export default function AddItems() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { postApi } = useApi();
+  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
 
   const navigateBack = () => {
     navigation.goBack();
@@ -23,7 +25,7 @@ export default function AddItems() {
       name: values.name.trim(),
     };
 
-    await postApi("", data);
+    await postApi("categories", data);
 
     dispatch(
       setInfoToast({
@@ -32,8 +34,6 @@ export default function AddItems() {
         type: "success",
       })
     );
-
-    dispatch(setRefreshCategories(true));
   };
 
   return (
@@ -41,11 +41,13 @@ export default function AddItems() {
       <HeaderScreen headerShown={false} />
 
       <ScreenContent style={sytles.container}>
-        <Card containerStyle={sytles.card}>
-          <Card.Title>Informe a categoria</Card.Title>
-          <Card.Divider />
+        <Card style={[sytles.card, { backgroundColor: theme.background }]}>
+          <Card.Content>
+            <Text style={[sytles.cardTitle, { color: theme.text }]}>Informe a categoria</Text>
+            <Divider style={sytles.divider} />
 
-          <FormCategories {...{ save, navigateBack }} />
+            <FormCategories {...{ save, navigateBack }} />
+          </Card.Content>
         </Card>
       </ScreenContent>
     </Container>
@@ -58,8 +60,18 @@ const sytles = StyleSheet.create({
     justifyContent: "center",
   },
   card: {
-    padding: 20,
+    padding: 10,
     width: "90%",
   },
-  buttonSave: { marginVertical: 20 },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  divider: {
+    marginBottom: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

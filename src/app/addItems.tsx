@@ -1,19 +1,21 @@
-import { Card } from "@rneui/base";
+import { Card, Text } from "react-native-paper";
 import { useNavigation } from "expo-router";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 import { useDispatch } from "react-redux";
+import { darkTheme, lightTheme } from "theme";
 import { useApi } from "~/ApiContext";
 import { Container } from "~/components/Container";
 import FormListPurchase from "~/components/FormListPurchase";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
-import { setInfoToast, setRefreshItens } from "~/store/reducers/geral";
+import { setInfoToast } from "~/store/reducers/geral";
 import { formatDecimal } from "~/utils/stringUtils";
 
 export default function AddItems() {
   const { postApi } = useApi();
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
 
   const handleClose = () => {
     navigation.goBack();
@@ -36,8 +38,6 @@ export default function AddItems() {
         type: "success",
       })
     );
-
-    dispatch(setRefreshItens(true));
   };
 
   return (
@@ -45,11 +45,14 @@ export default function AddItems() {
       <HeaderScreen headerShown={false} />
 
       <ScreenContent style={sytle.container}>
-        <Card containerStyle={sytle.card}>
-          <Card.Title>Informe os dados do produto</Card.Title>
-          <Card.Divider />
+        <Card style={[sytle.card, { backgroundColor: theme.background }]}>
+          <Card.Content>
+            <Text style={[sytle.cardTitle, { color: theme.textSecondary }]}>
+              Informe os dados do produto
+            </Text>
 
-          <FormListPurchase {...{ handleClose, save }} />
+            <FormListPurchase {...{ handleClose, save }} />
+          </Card.Content>
         </Card>
       </ScreenContent>
     </Container>
@@ -64,6 +67,10 @@ const sytle = StyleSheet.create({
   card: {
     padding: 20,
     width: "90%",
+  },
+  cardTitle: {
+    fontSize: 14,
+    marginBottom: 10,
   },
   buttonSave: { marginVertical: 20 },
 });

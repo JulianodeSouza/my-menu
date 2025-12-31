@@ -9,7 +9,7 @@ export const ButtonPrimary = forwardRef<View, IButtonProps>(
 
     return (
       <TouchableOpacity
-        ref={ref}
+        ref={ref}        
         {...buttonProps}
         style={[styles.button, buttonProps.style, { backgroundColor: theme.primary }]}>
         {icon ? icon : null}

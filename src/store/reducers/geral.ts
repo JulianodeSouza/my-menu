@@ -17,31 +17,9 @@ const geralReducer = createSlice({
     setInfoToast(state, action) {
       state.infoToast = action.payload;
     },
-
-    setRefreshItens(state, action) {
-      state.refreshItens = action.payload;
-    },
-
-    resetRefresh(state) {
-      state.refreshItens = initialState.refreshItens;
-    },
-
-    setRefreshCategories(state, action) {
-      state.refreshCategories = action.payload;
-    },
-
-    resetRefreshCategories(state) {
-      state.refreshCategories = initialState.refreshCategories;
-    },
   },
 });
 
 export default geralReducer.reducer;
 
-export const {
-  setInfoToast,
-  setRefreshItens,
-  resetRefresh,
-  setRefreshCategories,
-  resetRefreshCategories,
-} = geralReducer.actions;
+export const { setInfoToast } = geralReducer.actions;

@@ -7,7 +7,5 @@ export default function Refresh({
   refreshing: boolean;
   onRefresh: () => void;
 }) {
-  console.log(refreshing);
-
   return <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />;
 }

@@ -14,93 +14,137 @@ const ApiContext = createContext<ApiContextType | undefined>(undefined);
 
 interface ApiProviderProps {
   children: ReactNode;
-}
+} 
 
 export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
   const dispatch = useDispatch();
 
   const getApi = async (url: string, params: any) => {
-    try {
-      const result = await get(url, params);
-      return result;
-    } catch (e: any) {
-      console.error("Error in GET request:", e);
-      let message = "Houve um erro ao buscar os dados. Por favor, tente novamente.";
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const result = await get(url, params);
+        resolve(result);
+      } catch (e: any) {
+        console.error("Error in GET request: ");
+        console.error(e);
+        let message = "Houve um erro ao buscar os dados. Por favor, tente novamente.";
 
-      if (e.status !== "200" && e.response.data) {
-        message = e.response.data.message;
+        if (e.response?.data?.message) {
+          message = e.response.data.message;
+        } else if (e.code === "ECONNABORTED") {
+          message = "Tempo de conexão esgotado. Verifique sua conexão.";
+        } else if (e.message === "Network Error") {
+          message = "Erro de rede. Verifique sua conexão com a internet.";
+        }
+
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: message,
+            type: "error",
+          })
+        );
+
+        reject(e);
       }
+    });
 
-      dispatch(
-        setInfoToast({
-          open: true,
-          message: message,
-          type: "error",
-        })
-      );
-    }
+    return promise;
   };
+
   const postApi = async (url: string, data = {}) => {
-    try {
-      const result = await post(url, data);
-      return result;
-    } catch (e: any) {
-      let message = "Houve um erro ao salvar os dados. Por favor, tente novamente.";
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const result = await post(url, data);
+        resolve(result);
+      } catch (e: any) {
+        let message = "Houve um erro ao salvar os dados. Por favor, tente novamente.";
 
-      if (e.status !== "200" && e.response.data) {
-        message = e.response.data.message;
+        if (e.response?.data?.message) {
+          message = e.response.data.message;
+        } else if (e.code === "ECONNABORTED") {
+          message = "Tempo de conexão esgotado. Verifique sua conexão.";
+        } else if (e.message === "Network Error") {
+          message = "Erro de rede. Verifique sua conexão com a internet.";
+        }
+
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: message,
+            type: "error",
+          })
+        );
+
+        reject(e);
       }
+    });
 
-      dispatch(
-        setInfoToast({
-          open: true,
-          message: message,
-          type: "error",
-        })
-      );
-    }
+    return promise;
   };
+
   const putApi = async (url: string, data = {}) => {
-    try {
-      const result = await put(url, data);
-      return result;
-    } catch (e: any) {
-      console.error("Error in GET request:", e);
-      let message = "Houve um erro ao alterar os dados. Por favor, tente novamente.";
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const result = await put(url, data);
+        resolve(result);
+      } catch (e: any) {
+        console.error("Error in PUT request:", e);
+        let message = "Houve um erro ao alterar os dados. Por favor, tente novamente.";
 
-      if (e.status !== "200" && e.response.data) {
-        message = e.response.data.message;
+        if (e.response?.data?.message) {
+          message = e.response.data.message;
+        } else if (e.code === "ECONNABORTED") {
+          message = "Tempo de conexão esgotado. Verifique sua conexão.";
+        } else if (e.message === "Network Error") {
+          message = "Erro de rede. Verifique sua conexão com a internet.";
+        }
+
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: message,
+            type: "error",
+          })
+        );
+
+        reject(e);
       }
+    });
 
-      dispatch(
-        setInfoToast({
-          open: true,
-          message: message,
-          type: "error",
-        })
-      );
-    }
+    return promise;
   };
+
   const deleteApi = async (url: string) => {
-    try {
-      const result = await remove(url);
-      return result;
-    } catch (e: any) {
-      console.error("Error in GET request:", e);
-      let message = "Houve um erro ao remover os dados. Por favor, tente novamente.";
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const result = await remove(url);
+        resolve(result);
+      } catch (e: any) {
+        console.error("Error in DELETE request:", e);
+        let message = "Houve um erro ao remover os dados. Por favor, tente novamente.";
 
-      if (e.status !== "200" && e.response.data) {
-        message = e.response.data.message;
+        if (e.response?.data?.message) {
+          message = e.response.data.message;
+        } else if (e.code === "ECONNABORTED") {
+          message = "Tempo de conexão esgotado. Verifique sua conexão.";
+        } else if (e.message === "Network Error") {
+          message = "Erro de rede. Verifique sua conexão com a internet.";
+        }
+
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: message,
+            type: "error",
+          })
+        );
+
+        reject(e);
       }
+    });
 
-      dispatch(
-        setInfoToast({
-          open: true,
-          message: message,
-          type: "error",
-        })
-      );
-    }
+    return promise;
   };
 
   return (

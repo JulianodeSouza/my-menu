@@ -1,8 +1,7 @@
 {
   "build": {
     "production": {
-      "node": "18.18.0",
-      "buildType": "apk"
+      "node": "18.18.0"
     },
     "preview": {
       "extends": "production",
