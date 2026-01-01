@@ -9,6 +9,12 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # expo router
 expo-env.d.ts
 
