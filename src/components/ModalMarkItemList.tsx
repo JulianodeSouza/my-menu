@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { useDispatch } from "react-redux";
 import * as Yup from "yup";
-import { useListPurchaseDatabase } from "~/db/listPurchaseDatabase";
 import { setInfoToast } from "~/store/reducers/geral";
 import { formatDecimal, formatMonetary } from "~/utils/stringUtils";
 import { ButtonPrimary } from "./Buttons/ButtonPrimary";
@@ -11,6 +10,7 @@ import { ButtonTextSecondary } from "./Buttons/ButtonTextSecondary";
 import { Input } from "./Input";
 import { Modal } from "./Modal";
 import { TextComponent } from "./Text";
+import { useApi } from "~/ApiContext";
 
 export default function ModalMarkItemList({
   infoDialog,
@@ -19,8 +19,8 @@ export default function ModalMarkItemList({
   totalPurchase,
   setTotalPurchase,
 }) {
-  const purchaseListDatabase = useListPurchaseDatabase();
   const dispatch = useDispatch();
+  const { postApi, getApi } = useApi();
 
   const initialValues = {
     totalCaught: "",
@@ -37,37 +37,22 @@ export default function ModalMarkItemList({
     validationSchema: Schema,
     onSubmit: async (values) => {
       const data = {
-        itemChecked: !infoDialog.item.checked,
+        checked: !infoDialog.item.checked,
         totalCaught: Number(values.totalCaught),
         amount: formatDecimal(values.amount),
       };
 
       calculateTotal(values, infoDialog.item.checked);
-      await purchaseListDatabase
-        .markItemList(infoDialog.item.id, data)
-        .then(() => {
-          const message = infoDialog.item.checked
-            ? "Item desmarcado com sucesso!"
-            : "Item marcado com sucesso!";
+      await postApi(`list-supermarket/mark-item/${infoDialog.item.id}`, data);
 
-          dispatch(
-            setInfoToast({
-              open: true,
-              message: message,
-              type: "success",
-            })
-          );
+      dispatch(
+        setInfoToast({
+          open: true,
+          message: !data.checked ? "Item desmarcado com sucesso!" : "Item marcado com sucesso!",
+          type: "success",
         })
-        .catch((error) => {
-          console.error("Error updating item:", error);
-          dispatch(
-            setInfoToast({
-              open: true,
-              message: "Erro ao atualizar item",
-              type: "error",
-            })
-          );
-        });
+      );
+
       handleClose();
     },
   });
@@ -95,24 +80,10 @@ export default function ModalMarkItemList({
 
   useEffect(() => {
     const checkValuesMarked = async () => {
-      await purchaseListDatabase
-        .getItemById(infoDialog.item.id)
-        .then((item) => {
-          if (item.totalCaught && item.amount) {
-            formik.setFieldValue("totalCaught", item.totalCaught.toString());
-            formik.setFieldValue("amount", formatMonetary(item.amount).toString());
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          dispatch(
-            setInfoToast({
-              open: true,
-              message: "Erro ao atualizar item",
-              type: "error",
-            })
-          );
-        });
+      const item = await getApi(`list-supermarket/item/${infoDialog.item.id}`);
+
+      formik.setFieldValue("totalCaught", item.totalCaught.toString());
+      formik.setFieldValue("amount", formatMonetary(item.amount).toString());
     };
 
     if (!!infoDialog.open && infoDialog.item.checked) {

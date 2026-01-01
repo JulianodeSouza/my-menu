@@ -37,9 +37,12 @@ export async function remove(endpoint: string): Promise<any> {
 }
 
 function getUrlBase(): string {
-  // Produção
-  if (!__DEV__) {
-    return "http://44.221.138.71:21200/";
+  // Usa a URL definida nas variáveis de ambiente (via eas.json)
+  const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+  
+  // Produção - usa a URL do ambiente ou fallback
+  if (!__DEV__ || apiUrl) {
+    return apiUrl || "http://44.221.138.71:21200/";
   }
 
   // Desenvolvimento - Obtém o IP do host do Expo
