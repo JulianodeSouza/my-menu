@@ -19,6 +19,7 @@ import { useModalConfirmation } from "~/contexts/DialogContext";
 import { setInfoToast } from "~/store/reducers/geral";
 import { IListPurchaseView } from "~/types/listPurchase";
 import { formatMonetary } from "~/utils/stringUtils";
+import { calculateValuesByMeasuredUnits } from "~/utils/sumUtils";
 
 type IDialog = {
   open: boolean;
@@ -30,8 +31,8 @@ export default function Home() {
   const dispatch = useDispatch();
   const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
   const { openModalConfirmation } = useModalConfirmation();
-  const { getApi, deleteApi } = useApi();
-  const [items, setItems] = useState<IListPurchaseView[]>([]);
+  const { getApi, deleteApi, postApi } = useApi();
+  const [shoppingList, setItems] = useState<IListPurchaseView[]>([]);
   const [loadItems, setLoadItems] = useState<boolean>(false);
   const [infoDialog, setInfoDialog] = useState<IDialog>({ open: false, item: {} });
   const [totalPurchase, setTotalPurchase] = useState<number>(0);
@@ -51,7 +52,7 @@ export default function Home() {
   };
 
   const finishPurchase = async () => {
-    await deleteApi("list-supermarket/finish-purchase");
+    await postApi("list-supermarket/finish-purchase");
 
     dispatch(
       setInfoToast({
@@ -60,7 +61,6 @@ export default function Home() {
         type: "success",
       })
     );
-    setTotalPurchase(0);
     setLoadItems(true);
   };
 
@@ -82,10 +82,24 @@ export default function Home() {
     );
   };
 
+  const sumAmountPurchase = (shoppingList: IListPurchaseView[]) => {
+    let total = 0;
+
+    for (const shoppingItem of shoppingList) {
+      for (const item of shoppingItem.items) {
+        if (item.checked && item.amount && item.totalCaught) {
+          total += item.amount * item.totalCaught;
+        }
+      }
+    }
+    setTotalPurchase(total);
+  };
+
   useEffect(() => {
     const loadData = async () => {
       const results = await getApi("list-supermarket");
       setItems(results);
+      sumAmountPurchase(results);
     };
 
     if (loadItems) {
@@ -117,14 +131,14 @@ export default function Home() {
 
         <ScreenContent style={styles.containerList}>
           <ScrollContent>
-            {items.length > 0 && (
+            {shoppingList.length > 0 && (
               <>
-                {items.map((item) => (
-                  <View key={item.category}>
-                    <TextComponent style={styles.title}>{item.category}</TextComponent>
+                {shoppingList.map((shoppingItem) => (
+                  <View key={shoppingItem.category}>
+                    <TextComponent style={styles.title}>{shoppingItem.category}</TextComponent>
 
                     <Divider />
-                    {item.items.map((item) => (
+                    {shoppingItem.items.map((item) => (
                       <View key={item.id} style={styles.list}>
                         <TextTouchable
                           onLongPress={() => {
