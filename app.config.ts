@@ -11,7 +11,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     output: "static",
     favicon: "./assets/favicon.png",
   },
-  plugins: ["expo-router"],
+  plugins: [
+    "expo-router",
+    [
+      "expo-build-properties",
+      {
+        android: {
+          usesCleartextTraffic: true,
+        },
+      },
+    ],
+  ],
   experiments: {
     typedRoutes: true,
     tsconfigPaths: true,
@@ -45,5 +55,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // Variáveis de ambiente disponíveis no app
     appEnv: process.env.APP_ENV || "development",
     apiUrl: process.env.API_URL,
+    apiPort: process.env.API_PORT,
   },
 });
