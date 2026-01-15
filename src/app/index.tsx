@@ -19,7 +19,6 @@ import { useModalConfirmation } from "~/contexts/DialogContext";
 import { setInfoToast } from "~/store/reducers/geral";
 import { IListPurchaseView } from "~/types/listPurchase";
 import { formatMonetary } from "~/utils/stringUtils";
-import { calculateValuesByMeasuredUnits } from "~/utils/sumUtils";
 
 type IDialog = {
   open: boolean;

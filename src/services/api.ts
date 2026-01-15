@@ -39,7 +39,7 @@ export async function remove(endpoint: string): Promise<any> {
 function getUrlBase(): string {
   // Usa a URL definida nas variáveis de ambiente
   const apiUrl = Constants.expoConfig?.extra?.apiUrl;
-  
+
   // Produção - usa a URL do ambiente
   if (!__DEV__ || apiUrl) {
     if (!apiUrl) {
@@ -53,11 +53,11 @@ function getUrlBase(): string {
 
   if (debuggerHost) {
     // Usa o IP detectado pelo Expo (funciona em dispositivos físicos e emuladores)
-    return `http://${debuggerHost}:21200/`;
+    return `http://${debuggerHost}:${Constants.expoConfig?.extra?.apiPort}`;
   }
 
   // Fallback para emulador Android
-  return "http://10.0.2.2:21200/";
+  return `http://10.0.2.2:${Constants.expoConfig?.extra?.apiPort}`;
 }
 
 function getHeaders(): Record<string, string> {
