@@ -21,4 +21,3 @@ Projeto no Figma -> https://www.figma.com/file/vA65KfG5XJqgXhZddHpUSp/My-Menu?no
   
 ## ✔️ `Tecnologias utilizadas`
 - `React-native`
-- `SQLite`
