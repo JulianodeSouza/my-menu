@@ -1,20 +1,20 @@
 import { Card, Divider, Text } from "react-native-paper";
 import { useNavigation } from "expo-router";
-import { StyleSheet, useColorScheme } from "react-native";
+import { StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
-import { darkTheme, lightTheme } from "theme";
 import { useApi } from "~/ApiContext";
 import { Container } from "~/components/Container";
 import FormCategories from "~/components/FormCategories";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
+import { useTheme } from "~/contexts/ThemeContext";
 import { setInfoToast } from "~/store/reducers/geral";
 
 export default function AddItems() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { postApi } = useApi();
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
 
   const navigateBack = () => {
     navigation.goBack();

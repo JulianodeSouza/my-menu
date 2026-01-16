@@ -1,12 +1,12 @@
 import { Link } from "expo-router";
 import { forwardRef } from "react";
-import { StyleSheet, Text, useColorScheme, View } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { StyleSheet, Text, View } from "react-native";
+import { useTheme } from "~/contexts/ThemeContext";
 import { IButtonLinkProps } from "~/types/Buttons";
 
 export const ButtonNavigatePrimary = forwardRef<View, IButtonLinkProps>(
   ({ title, href, ...linkProps }) => {
-    const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+    const { theme } = useTheme();
 
     return (
       <Link

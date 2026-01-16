@@ -1,5 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity, useColorScheme, ViewStyle } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
+import { useTheme } from "~/contexts/ThemeContext";
 
 type ButtonProps = {
   title: string;
@@ -10,7 +10,7 @@ type ButtonProps = {
 };
 
 export const ButtonText = ({ title, iconStart, iconEnd, onPress, style }: ButtonProps) => {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
 
   return (
     <TouchableOpacity onPress={onPress} style={[styles.button, style]}>

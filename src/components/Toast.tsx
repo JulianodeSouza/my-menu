@@ -1,13 +1,13 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, useColorScheme, View } from "react-native";
+import { Animated, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setInfoToast } from "~/store/reducers/geral";
 import { TextComponent } from "./Text";
-import { darkTheme, lightTheme } from "theme";
+import { useTheme } from "~/contexts/ThemeContext";
 
 export const Toast = () => {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const geral = useSelector((state: any) => state.geral);
   const dispatch = useDispatch();
   const bottom = useRef(new Animated.Value(-80)).current;

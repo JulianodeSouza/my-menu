@@ -1,11 +1,11 @@
 import { forwardRef } from "react";
-import { StyleSheet, Text, TouchableOpacity, useColorScheme, View } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useTheme } from "~/contexts/ThemeContext";
 import { IButtonProps } from "~/types/Buttons";
 
 export const ButtonPrimary = forwardRef<View, IButtonProps>(
   ({ title, icon, ...buttonProps }, ref) => {
-    const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+    const { theme } = useTheme();
 
     return (
       <TouchableOpacity

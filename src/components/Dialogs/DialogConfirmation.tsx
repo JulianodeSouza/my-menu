@@ -1,10 +1,10 @@
 import { Portal, Dialog, Button, Text } from "react-native-paper";
-import { StyleSheet, useColorScheme, View } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { StyleSheet, View } from "react-native";
+import { useTheme } from "~/contexts/ThemeContext";
 import { useModalConfirmation } from "~/contexts/DialogContext";
 
 export const ModalConfirmation = () => {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const { isVisible, message, onConfirm, closeModalConfirmation } = useModalConfirmation();
 
   return (

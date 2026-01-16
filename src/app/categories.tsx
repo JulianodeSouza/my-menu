@@ -1,9 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Divider } from "react-native-paper";
 import { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, useColorScheme, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { darkTheme, lightTheme } from "theme";
 import { useApi } from "~/ApiContext";
 import FloatingButton from "~/components/Buttons/FloatingButton";
 import { Container } from "~/components/Container";
@@ -11,11 +10,12 @@ import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
 import { TextComponent } from "~/components/Text";
 import { useModalConfirmation } from "~/contexts/DialogContext";
+import { useTheme } from "~/contexts/ThemeContext";
 import { setInfoToast } from "~/store/reducers/geral";
 
 export default function Categories() {
   const dispatch = useDispatch();
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
   const geral = useSelector((state: any) => state.geral);
   const { openModalConfirmation } = useModalConfirmation();
   const { getApi, deleteApi } = useApi();

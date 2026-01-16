@@ -1,8 +1,8 @@
-import { TouchableHighlight, TouchableHighlightProps, useColorScheme } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { TouchableHighlight, TouchableHighlightProps } from "react-native";
+import { useTheme } from "~/contexts/ThemeContext";
 
 export const TextTouchable = ({ children, ...rest }: TouchableHighlightProps) => {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
 
   return (
     <TouchableHighlight underlayColor={theme.background} {...rest}>

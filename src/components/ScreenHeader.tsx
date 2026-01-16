@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
-import { useColorScheme } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { useTheme } from "~/contexts/ThemeContext";
 
 type HeaderProps = {
   headerShown?: boolean;
@@ -8,7 +7,7 @@ type HeaderProps = {
 };
 
 export const HeaderScreen = ({ title, headerShown }: HeaderProps) => {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
 
   return (
     <Stack.Screen

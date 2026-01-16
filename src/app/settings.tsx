@@ -1,8 +1,8 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Checkbox, Divider } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Appearance, ColorSchemeName, StyleSheet, useColorScheme, View } from "react-native";
+import { Appearance, ColorSchemeName, StyleSheet, View } from "react-native";
+import { Checkbox, Divider } from "react-native-paper";
 import { ButtonPrimary } from "~/components/Buttons/ButtonPrimary";
 import { ButtonTextSecondary } from "~/components/Buttons/ButtonTextSecondary";
 import { Container } from "~/components/Container";
@@ -10,11 +10,11 @@ import { Modal } from "~/components/Modal";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
 import { TextComponent } from "~/components/Text";
-import { ButtonNavigatePrimary } from "~/components/Buttons/ButtonNavigatePrimary";
-import { useRouter } from "expo-router";
+import { useTheme } from "~/contexts/ThemeContext";
 
 export default function Settings() {
-  const [themeSelected, setThemeSelected] = useState(useColorScheme());
+  const { isDark } = useTheme();
+  const [themeSelected, setThemeSelected] = useState<ColorSchemeName>(isDark ? "dark" : "light");
   const [infoDialog, setInfoDialog] = useState({ open: false });
   const router = useRouter();
 

@@ -113,7 +113,7 @@ export default function ModalMarkItemList({
         textError={formik.errors.amount}
       />
 
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+      <View style={styles.buttonsContainer}>
         <ButtonTextSecondary title="Fechar" onPress={handleClose} />
         <ButtonPrimary
           title={infoDialog.item.checked ? "Desmarcar" : "Marcar"}
@@ -131,5 +131,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     padding: 10,
     textAlign: "center",
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
