@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { spacing } from "theme";
 import { useTheme } from "~/contexts/ThemeContext";
 
 export const Container = ({ children }: { children: ReactNode }) => {
@@ -16,5 +17,6 @@ export const Container = ({ children }: { children: ReactNode }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: spacing.xs,
   },
 });

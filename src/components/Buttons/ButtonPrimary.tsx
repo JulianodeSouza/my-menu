@@ -9,11 +9,10 @@ export const ButtonPrimary = forwardRef<View, IButtonProps>(
 
     return (
       <TouchableOpacity
-        ref={ref}        
+        ref={ref}
         {...buttonProps}
         style={[styles.button, buttonProps.style, { backgroundColor: theme.primary }]}>
         {icon ? icon : null}
-
         <Text style={[styles.buttonText, { color: theme.text }]}>{title}</Text>
       </TouchableOpacity>
     );
@@ -41,5 +40,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",
+    paddingHorizontal: 8,
   },
 });

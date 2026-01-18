@@ -14,10 +14,11 @@ export const HeaderScreen = ({ title, headerShown }: HeaderProps) => {
       options={{
         headerShown: headerShown,
         title: title,
+        headerTintColor: theme.text,
+        headerShadowVisible: false,
         headerStyle: {
           backgroundColor: theme.background,
         },
-        headerTintColor: theme.text,
         headerTitleStyle: {
           fontWeight: "bold",
         },
