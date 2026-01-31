@@ -5,12 +5,7 @@ import { useApi } from "~/ApiContext";
 import Icon from "~/components/Icon";
 import { TextComponent } from "~/components/Text";
 import { useTheme } from "~/contexts/ThemeContext";
-
-interface CategorieProps {
-  id: number;
-  name: string;
-  icon: string;
-}
+import { CategorieProps } from "~/types/categories";
 
 export default function Categories() {
   const { theme } = useTheme();

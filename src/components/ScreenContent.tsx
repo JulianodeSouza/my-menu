@@ -15,5 +15,7 @@ export const ScreenContent = ({ children, ...ViewProps }: ScreenContentProps) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "stretch",
   },
 });

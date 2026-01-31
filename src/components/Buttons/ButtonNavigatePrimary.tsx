@@ -2,7 +2,7 @@ import { Link } from "expo-router";
 import { forwardRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useTheme } from "~/contexts/ThemeContext";
-import { IButtonLinkProps } from "~/types/Buttons";
+import { IButtonLinkProps } from "~/types/buttons";
 
 export const ButtonNavigatePrimary = forwardRef<View, IButtonLinkProps>(
   ({ title, href, ...linkProps }) => {

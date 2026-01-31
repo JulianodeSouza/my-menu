@@ -141,7 +141,7 @@ export const lightTheme = {
   overlay: "rgba(0, 0, 0, 0.5)",
   primaryOpacity5: "rgba(34, 197, 94, 0.05)",
   primaryOpacity10: "rgba(34, 197, 94, 0.1)",
-  secondaryOpacity50: "rgba(244, 244, 245, 0.5)",
+  secondaryOpacity50: "rgba(244, 244, 245, 0.3)",
 };
 
 // ===========================================
@@ -184,8 +184,8 @@ export const darkTheme = {
   inputBackground: "#1a1a1a",
 
   // Opacidades
-  overlay: "rgba(0, 0, 0, 0.5)",
+  overlay: "rgba(0, 0, 0, 0.3)",
   primaryOpacity5: "rgba(34, 197, 94, 0.05)",
   primaryOpacity10: "rgba(34, 197, 94, 0.1)",
-  secondaryOpacity50: "rgba(39, 39, 42, 0.5)",
+  secondaryOpacity50: "rgba(39, 39, 42, 0.3)",
 };

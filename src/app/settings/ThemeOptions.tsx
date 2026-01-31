@@ -53,7 +53,7 @@ function ThemeOptionItem({ option, isSelected, onSelect }: ThemeOptionItemProps)
       iconWrapper: {
         backgroundColor: isSelected ? theme.primary : theme.border,
       },
-      iconColor: isSelected ? "#ffffff" : theme.text,
+      iconColor: isSelected ? theme.primaryForeground : theme.text,
     }),
     [isSelected, theme]
   );
@@ -64,7 +64,11 @@ function ThemeOptionItem({ option, isSelected, onSelect }: ThemeOptionItemProps)
 
   return (
     <TouchableOpacity
-      style={[styles.optionContainer, dynamicStyles.container]}
+      style={[
+        styles.optionContainer,
+        dynamicStyles.container,
+        { backgroundColor: isSelected ? theme.primaryOpacity5 : "transparent" },
+      ]}
       onPress={handlePress}
       accessibilityRole="radio"
       accessibilityState={{ selected: isSelected }}

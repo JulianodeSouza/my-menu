@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "~/contexts/ThemeContext";
-import { IButtonProps } from "~/types/Buttons";
+import { IButtonProps } from "~/types/buttons";
 
 export const ButtonPrimary = forwardRef<View, IButtonProps>(
   ({ title, icon, ...buttonProps }, ref) => {
@@ -23,7 +23,6 @@ const styles = StyleSheet.create({
   button: {
     alignItems: "center",
     borderRadius: 24,
-    elevation: 5,
     flexDirection: "row",
     justifyContent: "center",
     padding: 16,

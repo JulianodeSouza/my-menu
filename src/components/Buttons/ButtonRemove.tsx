@@ -1,12 +1,7 @@
 import { forwardRef } from "react";
-import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "~/contexts/ThemeContext";
-import { IButtonProps } from "~/types/Buttons";
+import { IButtonProps } from "~/types/buttons";
 
 export const ButtonRemove = forwardRef<View, IButtonProps>(
   ({ title, icon, ...buttonProps }, ref) => {

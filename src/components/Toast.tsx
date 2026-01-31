@@ -2,9 +2,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { borderRadius, fontWeights, spacing } from "theme";
+import { useTheme } from "~/contexts/ThemeContext";
 import { setInfoToast } from "~/store/reducers/geral";
 import { TextComponent } from "./Text";
-import { useTheme } from "~/contexts/ThemeContext";
 
 export const Toast = () => {
   const { theme } = useTheme();
@@ -50,6 +51,9 @@ export const Toast = () => {
       case "warning":
         backgroundColor = theme.warning;
         break;
+      case "info":
+        backgroundColor = theme.info;
+        break;
       default:
         backgroundColor;
         break;
@@ -73,7 +77,7 @@ export const Toast = () => {
             { bottom, opacity, backgroundColor: getBackgroundColor(geral.infoToast.type) },
           ]}>
           <View style={style.toastInfo}>
-            <TextComponent style={{ color: theme.textError, fontWeight: "bold" }}>
+            <TextComponent style={[style.textToast, { color: theme.text }]}>
               {geral.infoToast.message}
             </TextComponent>
             <MaterialIcons
@@ -98,11 +102,13 @@ const style = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#000",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20,
-    marginHorizontal: 20,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.lg,
+    marginHorizontal: spacing.lg,
+  },
+  textToast: {
+    fontWeight: fontWeights.bold,
   },
   toastInfo: {
     flexDirection: "row",

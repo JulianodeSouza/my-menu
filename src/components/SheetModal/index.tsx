@@ -139,7 +139,7 @@ export function SheetModal({
     const baseStyle = [
       styles.content,
       {
-        backgroundColor: theme.background,
+        backgroundColor: theme.card,
         borderColor: theme.border,
       },
     ];
@@ -155,19 +155,23 @@ export function SheetModal({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={handleClose}>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
       <View style={styles.container}>
-        <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
+        <Animated.View style={[styles.overlay]}>
           <Pressable style={styles.overlayPressable} onPress={handleClose} />
         </Animated.View>
 
         <Animated.View style={getContentStyle()} {...(isVertical ? panResponder.panHandlers : {})}>
           {side === "bottom" && (
-            <View style={[styles.dragIndicator, { backgroundColor: theme.border }]} />
+            <View style={[styles.dragIndicator, { backgroundColor: theme.textMuted }]} />
           )}
 
           {(title || description || showCloseButton) && (
-            <View style={styles.header}>
+            <View
+              style={[
+                styles.header,
+                { borderBottomColor: theme.textMuted, borderBottomWidth: 0.2 },
+              ]}>
               <View style={styles.headerText}>
                 {title && (
                   <TextComponent style={[styles.title, { color: theme.foreground }]}>
@@ -236,7 +240,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   overlayPressable: {
     flex: 1,
@@ -299,13 +302,14 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     padding: spacing.base,
     gap: spacing.md,
+    marginBottom: spacing.xxl,
   },
   headerText: {
     flex: 1,
     gap: spacing.xs,
   },
   title: {
-    fontSize: typography.fontSizeLg,
+    fontSize: typography.fontSizeXl,
     fontWeight: fontWeights.semibold,
   },
   description: {

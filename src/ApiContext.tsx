@@ -14,7 +14,7 @@ const ApiContext = createContext<ApiContextType | undefined>(undefined);
 
 interface ApiProviderProps {
   children: ReactNode;
-} 
+}
 
 export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
   const dispatch = useDispatch();

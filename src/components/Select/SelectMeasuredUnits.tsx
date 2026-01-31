@@ -1,8 +1,9 @@
-import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
 import { useApi } from "~/ApiContext";
+import Select from ".";
 
-export default function SelectMeasuredUnits({ value, handleChange }) {
+export default function SelectMeasuredUnits({ value, handleChange, isRequired }) {
   const apiContext = useApi();
   const [measuredUnits, setMeasuredUnits] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,14 +25,19 @@ export default function SelectMeasuredUnits({ value, handleChange }) {
   }, []);
 
   return (
-    <Picker
-      style={{ backgroundColor: "#fff", borderWidth: 1, marginTop: 10 }}
-      placeholder="Categoria"
-      selectedValue={value || ""}
-      onValueChange={(itemValue) => handleChange(itemValue)}>
-      {measuredUnits.map((measuredUnit) => (
-        <Picker.Item key={measuredUnit.id} value={measuredUnit.id} label={measuredUnit.name} />
-      ))}
-    </Picker>
+    <Select
+      style={styles.inputSelect}
+      label="Unidade de medida"
+      options={measuredUnits.map((unit) => ({ label: unit.name, value: unit.id }))}
+      value={value}
+      onChange={handleChange}
+      isRequired={isRequired}
+    />
   );
 }
+
+const styles = StyleSheet.create({
+  inputSelect: {
+    width: "100%",
+  },
+});
