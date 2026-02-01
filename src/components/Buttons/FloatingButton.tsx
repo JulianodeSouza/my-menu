@@ -1,6 +1,6 @@
-import { FAB } from "react-native-paper";
 import { StyleSheet, ViewStyle } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { FAB } from "react-native-paper";
+import Icon from "../Icon";
 
 type FloatingButtonProps = {
   icon?: React.ReactNode;
@@ -12,7 +12,7 @@ type FloatingButtonProps = {
 export default function FloatingButton({ icon, color, onPress, style }: FloatingButtonProps) {
   return (
     <FAB
-      icon={() => icon || <MaterialIcons name="add" size={24} color="white" />}
+      icon={() => icon || <Icon name="Plus" size={24} color="white" />}
       onPress={onPress}
       style={[styles.fab, { backgroundColor: color || "green" }, style]}
       color="white"

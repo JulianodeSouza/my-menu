@@ -6,16 +6,12 @@ import { ScreenContent } from "~/components/ScreenContent";
 import { TextComponent } from "~/components/Text";
 import { useShoppingContext } from "~/contexts/ShoppingContext";
 import { useTheme } from "~/contexts/ThemeContext";
-import { formatMonetary } from "~/utils/stringUtils";
+import { formatNumberToMonetary } from "~/utils/stringUtils";
+import { getLengthTotalOfList, getTotalMarkedItems } from "~/utils/sumUtils";
 
 export default function ShoppingStatus() {
   const { theme } = useTheme();
-  const shoppingContext = useShoppingContext();
-
-  const totalMarked = shoppingContext.shoppingList.reduce((acc, category) => {
-    const markedItems = category.items.filter((item) => item.checked).length;
-    return acc + markedItems;
-  }, 0);
+  const { shoppingList, progress, totalPurchase } = useShoppingContext();
 
   return (
     <ScreenContent style={styles.container}>
@@ -26,7 +22,7 @@ export default function ShoppingStatus() {
             <TextComponent style={styles.title}>Itens</TextComponent>
           </View>
           <TextComponent style={styles.subTitle}>
-            {totalMarked}/{shoppingContext.shoppingList.length}
+            {getTotalMarkedItems(shoppingList)}/{getLengthTotalOfList(shoppingList)}
           </TextComponent>
         </CardShop>
         <CardShop>
@@ -34,7 +30,7 @@ export default function ShoppingStatus() {
             <Icon name="CircleCheck" color={theme.primary} size={15} />
             <TextComponent style={styles.title}>Progresso</TextComponent>
           </View>
-          <TextComponent style={styles.subTitle}>{shoppingContext.progress}%</TextComponent>
+          <TextComponent style={styles.subTitle}>{progress}%</TextComponent>
         </CardShop>
         <CardShop>
           <View style={styles.titleCardContainer}>
@@ -42,7 +38,7 @@ export default function ShoppingStatus() {
             <TextComponent style={styles.title}>Total</TextComponent>
           </View>
           <TextComponent style={styles.subTitle}>
-            {formatMonetary(shoppingContext.totalPurchase)}
+            {formatNumberToMonetary(totalPurchase)}
           </TextComponent>
         </CardShop>
       </View>

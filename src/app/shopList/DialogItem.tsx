@@ -25,7 +25,7 @@ export default function DialogItem({
   const handleAction = (values: IListPurchase) => {
     const item = values;
 
-    if (!values || (mode === "mark" && (!values.totalCaught || !values.amount))) {
+    if (!values) {
       return;
     }
 

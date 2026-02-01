@@ -13,7 +13,8 @@ import { useShoppingContext } from "~/contexts/ShoppingContext";
 import { useTheme } from "~/contexts/ThemeContext";
 import { setInfoToast } from "~/store/reducers/geral";
 import { IListPurchase, IListPurchaseView } from "~/types/shopList";
-import { formatMonetary } from "~/utils/stringUtils";
+import { formatNumberToMonetary } from "~/utils/stringUtils";
+import { calculateProgress, calculateValuesByMeasuredUnits } from "~/utils/sumUtils";
 import DialogItem from "./DialogItem";
 
 type ModalMode = "edit" | "mark";
@@ -23,12 +24,18 @@ type EditionModalProps = {
   item?: IListPurchase;
   mode?: ModalMode;
 };
-
 export default function CardItemsList({ items, category, categoryIcon, index }: IListPurchaseView) {
   const dispatch = useDispatch();
-  const shoppingContext = useShoppingContext();
+  const {
+    shoppingList,
+    setProgress,
+    setAnyItemMarked,
+    setShoppingList,
+    setTotalPurchase,
+    setLoadItems,
+  } = useShoppingContext();
   const confirmationModal = useModalConfirmation();
-  const { deleteApi } = useApi();
+  const { deleteApi, postApi } = useApi();
   const { theme } = useTheme();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const checkedCount = items.filter((item) => item.checked).length;
@@ -46,49 +53,46 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
     setExpandedIndex(expandedIndex === 0 ? null : 0);
   };
 
+  const calculateShoppingListTotal = useCallback((list: IListPurchaseView[]) => {
+    let total = 0;
+    let havePendingInfo = false;
+
+    for (const shoppingItem of list) {
+      for (const item of shoppingItem.items) {
+        if (item.checked && item.amount && (item.totalCaught || item.quantity)) {
+          total += calculateValuesByMeasuredUnits(
+            item.amount,
+            item.totalCaught || item.quantity,
+            item.unitSymbol
+          );
+        } else if (item.checked && (!item.amount || (!item.totalCaught && !item.quantity))) {
+          setSheetModalInfo({ open: true, item, mode: "mark" });
+          havePendingInfo = true;
+          break;
+        }
+        if (havePendingInfo) break;
+      }
+    }
+
+    if (havePendingInfo) return;
+
+    const progress = calculateProgress(list);
+    setProgress(progress);
+    setShoppingList(list);
+    setTotalPurchase(total);
+  }, []);
+
   const markItem = useCallback(
     (itemId: number, checked: boolean) => {
-      const updatedList = shoppingContext.shoppingList.map((category) => ({
+      const updatedList = shoppingList.map((category) => ({
         ...category,
         items: category.items.map((item) => (item.id === itemId ? { ...item, checked } : item)),
       }));
 
       calculateShoppingListTotal(updatedList);
     },
-    [shoppingContext.shoppingList]
+    [shoppingList, calculateShoppingListTotal]
   );
-
-  const calculateShoppingListTotal = useCallback((list: IListPurchaseView[]) => {
-    let total = 0;
-
-    for (const shoppingItem of list) {
-      for (const item of shoppingItem.items) {
-        if (item.checked && item.amount && item.totalCaught) {
-          total += Number(item.amount) * Number(item.totalCaught);
-        } else {
-          setSheetModalInfo({ open: true, item, mode: "mark" });
-          break;
-        }
-      }
-    }
-
-    if (total === 0) return;
-
-    calculateProgress(list);
-    shoppingContext.setShoppingList(list);
-    shoppingContext.setTotalPurchase(total);
-  }, []);
-
-  const calculateProgress = (list: IListPurchaseView[]) => {
-    const totalItemsMarked = list.reduce((acc, category) => {
-      const markedItems = category.items.filter((item) => item.checked).length;
-      return acc + markedItems;
-    }, 0);
-
-    const totalProgress = (totalItemsMarked * 100) / shoppingContext.shoppingList.length;
-
-    shoppingContext.setProgress(totalProgress);
-  };
 
   const removeItem = useCallback(
     async (idItem: number) => {
@@ -103,22 +107,46 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
           })
         );
 
-        shoppingContext.setLoadItems(true);
+        setLoadItems(true);
       });
     },
-    [deleteApi, dispatch]
+    [deleteApi, dispatch, setLoadItems]
   );
 
-  const updateItem = useCallback((updatedItem: IListPurchase) => {}, []);
+  const unmarkItemPurchase = useCallback(
+    async (item: IListPurchase) => {
+      const itemToSend = {
+        ...item,
+        amount: 0,
+        totalCaught: 0,
+        checked: false,
+      };
 
-  const registerItemPurchase = useCallback((purchasedItem: IListPurchase) => {}, []);
+      await postApi(`list-supermarket/mark-item/${item.id}`, itemToSend);
+      setLoadItems(true);
+    },
+    [postApi, markItem]
+  );
+
+  const registerItemPurchase = useCallback(
+    async (purchasedItem: IListPurchase) => {
+      const itemToSend = {
+        ...purchasedItem,
+        checked: true,
+      };
+
+      await postApi(`list-supermarket/mark-item/${purchasedItem.id}`, itemToSend);
+      setLoadItems(true);
+    },
+    [postApi, markItem]
+  );
 
   return (
     <>
       <CardShop
         isPressable={true}
         onPress={handlePress}
-        styles={index % 2 === 0 && expandedIndex === null ? styles.spacingAccordions : undefined}>
+        styles={expandedIndex === null ? styles.spacingAccordions : undefined}>
         <View style={styles.containerAccordion}>
           <View style={styles.infoAccordion}>
             <Icon name={categoryIcon} color={theme.primary} size={35} />
@@ -170,18 +198,27 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
             { backgroundColor: theme.card, borderColor: theme.border },
           ]}>
           {items.map((item) => (
-            <View key={item.id} style={styles.itemRow}>
+            <View key={item.id} style={[styles.itemRow, { borderColor: theme.border }]}>
               <View style={styles.itemInfoContainer}>
                 <RadioButton
                   color={theme.primaryDark}
                   value="first"
                   status={item.checked ? "checked" : "unchecked"}
                   onPress={() => {
-                    markItem(item.id, !item.checked);
+                    if (item.checked) {
+                      unmarkItemPurchase(item);
+                    } else {
+                      markItem(item.id, !item.checked);
+                    }
                   }}
                 />
                 <View>
-                  <TextComponent>{item.name}</TextComponent>
+                  <TextComponent
+                    style={
+                      item.checked ? [styles.checkedItem, { color: theme.textMuted }] : undefined
+                    }>
+                    {item.name}
+                  </TextComponent>
                   <View style={styles.quantityContainer}>
                     <TextComponent style={[styles.itemQuantity, { color: theme.textMuted }]}>
                       {item.quantity} {item.unitSymbol}
@@ -192,7 +229,7 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
                           •
                         </TextComponent>
                         <TextComponent style={[styles.itemQuantity, { color: theme.textMuted }]}>
-                          {formatMonetary(item.amount || 0)}
+                          {formatNumberToMonetary(item.amount || 0)}
                         </TextComponent>
                       </>
                     )}
@@ -200,16 +237,30 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
                 </View>
               </View>
               <View style={styles.buttonsContainer}>
-                <ButtonText
+                <View>
+                  {!!item.checked && (
+                    <TextComponent style={[styles.itemTotal, { color: theme.textMuted }]}>
+                      {formatNumberToMonetary(
+                        calculateValuesByMeasuredUnits(
+                          item.amount || 0,
+                          item.totalCaught,
+                          item.unitSymbol
+                        )
+                      )}
+                    </TextComponent>
+                  )}
+                </View>
+                {/* <ButtonText
                   title=""
                   iconStart="Pen"
                   iconSize={15}
                   onPress={() => setSheetModalInfo({ open: true, item, mode: "edit" })}
-                />
+                /> */}
                 <ButtonText
                   title=""
                   iconStart="Trash2"
                   iconSize={15}
+                  iconColor={theme.error}
                   onPress={() => {
                     removeItem(item.id);
                   }}
@@ -231,9 +282,7 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
               setSheetModalInfo({ open: false });
             },
             handleActionForm(values, mode) {
-              if (mode === "edit") {
-                updateItem(values);
-              } else if (mode === "mark") {
+              if (mode === "mark") {
                 registerItemPurchase(values);
               }
             },
@@ -320,5 +369,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.xs,
+  },
+  checkedItem: {
+    textDecorationLine: "line-through",
+  },
+  itemTotal: {
+    fontWeight: fontWeights.semibold,
   },
 });

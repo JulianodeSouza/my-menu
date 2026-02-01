@@ -1,8 +1,9 @@
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { useDispatch } from "react-redux";
 import { useApi } from "~/ApiContext";
+import { ButtonTextSecondary } from "~/components/Buttons/ButtonTextSecondary";
 import FloatingButton from "~/components/Buttons/FloatingButton";
 import { Container } from "~/components/Container";
 import ScrollContent from "~/components/ScrollContent";
@@ -18,14 +19,21 @@ import ShoppingStatus from "./ShoppingStatus";
 export default function ShopList() {
   const { postApi } = useApi();
   const dispatch = useDispatch();
-  const shoppingContext = useShoppingContext();
+  const {
+    shoppingList,
+    setLoadItems,
+    setRefreshItems,
+    refreshItems,
+    anyItemMarked,
+    finishPurchase,
+  } = useShoppingContext();
   const [newItemModal, setNewItemModal] = useState<Pick<IDialog, "open">>({
     open: false,
   });
 
   useFocusEffect(
     useCallback(() => {
-      shoppingContext.setLoadItems(true);
+      setLoadItems(true);
     }, [])
   );
 
@@ -37,6 +45,7 @@ export default function ShopList() {
       quantity: formatDecimal(values.quantity),
       category: values.category,
       measuredUnit: values.measuredUnit,
+      amount: values.amount,
     };
 
     await postApi("list-supermarket", data);
@@ -48,28 +57,28 @@ export default function ShopList() {
         type: "success",
       })
     );
-    shoppingContext.setLoadItems(true);
+    setLoadItems(true);
   };
 
   return (
     <>
       <Container>
         <ScrollContent
-          refreshing={shoppingContext.refreshItems}
+          refreshing={refreshItems}
           onRefreshControl={() => {
-            shoppingContext.setRefreshItems(true);
+            setRefreshItems(true);
           }}>
           <ShoppingStatus />
 
-          {shoppingContext.shoppingList.length === 0 && (
+          {shoppingList.length === 0 && (
             <View style={styles.emptyContainer}>
               <EmptyList />
             </View>
           )}
 
-          {shoppingContext.shoppingList.length > 0 && (
+          {shoppingList.length > 0 && (
             <>
-              {shoppingContext.shoppingList.map((itemList, index) => (
+              {shoppingList.map((itemList, index) => (
                 <CardItemsList
                   key={itemList.category}
                   {...{
@@ -85,6 +94,12 @@ export default function ShopList() {
         </ScrollContent>
 
         <View style={styles.footer}>
+          {anyItemMarked && (
+            <View style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
+              <ButtonTextSecondary title="Finalizar compra" onPress={finishPurchase} />
+            </View>
+          )}
+
           <FloatingButton
             color="green"
             onPress={() => {
@@ -116,8 +131,9 @@ const styles = StyleSheet.create({
   },
   footer: {
     display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
     margin: 10,
   },
 });

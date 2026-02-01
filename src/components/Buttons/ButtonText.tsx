@@ -1,16 +1,7 @@
-import * as icons from "lucide-react-native/icons";
-import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useTheme } from "~/contexts/ThemeContext";
+import { IButtonProps } from "~/types/buttons";
 import Icon from "../Icon";
-
-type ButtonProps = {
-  title: string;
-  iconStart?: keyof typeof icons;
-  iconEnd?: keyof typeof icons;
-  iconSize?: number;
-  onPress?: () => void;
-  style?: ViewStyle;
-};
 
 export const ButtonText = ({
   title,
@@ -19,14 +10,15 @@ export const ButtonText = ({
   iconSize = 20,
   onPress,
   style,
-}: ButtonProps) => {
+  iconColor,
+}: IButtonProps) => {
   const { theme } = useTheme();
 
   return (
     <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
-      {iconStart ? <Icon name={iconStart} size={iconSize} color={theme.text} /> : null}
+      {iconStart ? <Icon name={iconStart} size={iconSize} color={iconColor || theme.text} /> : null}
       <Text style={[styles.buttonText, { color: theme.text }]}>{title}</Text>
-      {iconEnd ? <Icon name={iconEnd} size={iconSize} color={theme.text} /> : null}
+      {iconEnd ? <Icon name={iconEnd} size={iconSize} color={iconColor || theme.text} /> : null}
     </TouchableOpacity>
   );
 };

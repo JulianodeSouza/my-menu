@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useApi } from "~/ApiContext";
@@ -10,8 +11,22 @@ export default function SelectMeasuredUnits({ value, handleChange, isRequired })
 
   useEffect(() => {
     const loadMeasuredUnits = async () => {
-      const result = await apiContext.getApi("measuredUnits");
-      setMeasuredUnits(result);
+      try {
+        // Try to get from cache first
+        const cachedUnits = await AsyncStorage.getItem("measuredUnits");
+        if (cachedUnits) {
+          setMeasuredUnits(JSON.parse(cachedUnits));
+        } else {
+          // If not in cache, fetch from API
+          const result = await apiContext.getApi("measuredUnits");
+          setMeasuredUnits(result);
+          await AsyncStorage.setItem("measuredUnits", JSON.stringify(result));
+        }
+      } catch (error) {
+        console.error("Erro ao carregar unidades de medida:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     if (loading) {

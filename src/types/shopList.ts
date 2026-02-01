@@ -49,6 +49,8 @@ export type ShoppingContextType = {
   setRefreshItems: (refresh: boolean) => void;
   // Actions
   finishPurchase: () => Promise<void>;
+  anyItemMarked: boolean;
+  setAnyItemMarked: (marked: boolean) => void;
 };
 
 export type ShoppingProviderProps = {

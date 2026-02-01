@@ -2,9 +2,10 @@ import { forwardRef } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "~/contexts/ThemeContext";
 import { IButtonProps } from "~/types/buttons";
+import Icon from "../Icon";
 
 export const ButtonPrimary = forwardRef<View, IButtonProps>(
-  ({ title, icon, ...buttonProps }, ref) => {
+  ({ title, iconStart, iconEnd, iconSize, iconColor, ...buttonProps }, ref) => {
     const { theme } = useTheme();
 
     return (
@@ -12,8 +13,11 @@ export const ButtonPrimary = forwardRef<View, IButtonProps>(
         ref={ref}
         {...buttonProps}
         style={[styles.button, buttonProps.style, { backgroundColor: theme.primary }]}>
-        {icon ? icon : null}
+        {iconStart ? (
+          <Icon name={iconStart} size={iconSize} color={iconColor || theme.text} />
+        ) : null}
         <Text style={[styles.buttonText, { color: theme.text }]}>{title}</Text>
+        {iconEnd ? <Icon name={iconEnd} size={iconSize} color={iconColor || theme.text} /> : null}
       </TouchableOpacity>
     );
   }
