@@ -1,11 +1,11 @@
 import { Link } from "expo-router";
-import { StyleSheet, Text, useColorScheme } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { StyleSheet, Text } from "react-native";
 import { Container } from "~/components/Container";
 import { HeaderScreen } from "~/components/ScreenHeader";
+import { useTheme } from "~/contexts/ThemeContext";
 
 export default function NotFoundScreen() {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
 
   return (
     <>

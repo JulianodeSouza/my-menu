@@ -1,5 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, useColorScheme, ViewStyle } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
+import { borderRadius, fontWeights, spacing, typography } from "theme";
+import { useTheme } from "~/contexts/ThemeContext";
+import { IButtonProps } from "~/types/buttons";
+import Icon from "../Icon";
 
 type ButtonProps = {
   title: string;
@@ -8,13 +11,22 @@ type ButtonProps = {
   style?: ViewStyle;
 };
 
-export const ButtonTextSecondary = ({ title, icon, onPress, style }: ButtonProps) => {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+export const ButtonTextSecondary = ({
+  title,
+  iconStart,
+  iconEnd,
+  iconSize,
+  iconColor,
+  onPress,
+  style,
+}: IButtonProps) => {
+  const { theme } = useTheme();
 
   return (
     <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
-      {icon}
+      {iconStart ? <Icon name={iconStart} size={iconSize} color={iconColor || theme.text} /> : null}
       <Text style={[styles.buttonText, { color: theme.textSecondary }]}>{title}</Text>
+      {iconEnd ? <Icon name={iconEnd} size={iconSize} color={iconColor || theme.text} /> : null}
     </TouchableOpacity>
   );
 };
@@ -22,14 +34,14 @@ export const ButtonTextSecondary = ({ title, icon, onPress, style }: ButtonProps
 const styles = StyleSheet.create({
   button: {
     alignItems: "center",
-    borderRadius: 24,
+    borderRadius: borderRadius.md,
     flexDirection: "row",
     justifyContent: "center",
-    padding: 16,
+    padding: spacing.sm,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: typography.fontSizeBase,
+    fontWeight: fontWeights.bold,
     textAlign: "center",
   },
 });

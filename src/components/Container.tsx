@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
-import { StyleSheet, useColorScheme } from "react-native";
+import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { darkTheme, lightTheme } from "theme";
+import { spacing } from "theme";
+import { useTheme } from "~/contexts/ThemeContext";
 
 export const Container = ({ children }: { children: ReactNode }) => {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
@@ -16,5 +17,6 @@ export const Container = ({ children }: { children: ReactNode }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: spacing.xs,
   },
 });

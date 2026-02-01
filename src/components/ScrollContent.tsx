@@ -1,17 +1,13 @@
-import React from "react";
-import { ScrollView } from "react-native";
+import { RefreshControl, ScrollView } from "react-native";
+import { IScrollContent } from "~/types/scrollContent";
 
-export default function ScrollContent({
-  children,
-  refreshing,
-  onRefresh,
-}: {
-  children: React.ReactNode;
-  refreshing?: boolean;
-  onRefresh?: () => void;
-}) {
+export default function ScrollContent({ children, onRefreshControl, refreshing }: IScrollContent) {
   return (
-    <ScrollView style={{ flex: 1, height: "90%" }} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={{ flex: 1 }}
+      showsVerticalScrollIndicator={false}
+      keyboardDismissMode="on-drag"
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefreshControl} />}>
       {children}
     </ScrollView>
   );

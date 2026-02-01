@@ -1,13 +1,13 @@
 import { Card, Text } from "react-native-paper";
 import { useNavigation } from "expo-router";
-import { StyleSheet, useColorScheme } from "react-native";
+import { StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
-import { darkTheme, lightTheme } from "theme";
 import { useApi } from "~/ApiContext";
 import { Container } from "~/components/Container";
 import FormListPurchase from "~/components/FormListPurchase";
 import { ScreenContent } from "~/components/ScreenContent";
 import { HeaderScreen } from "~/components/ScreenHeader";
+import { useTheme } from "~/contexts/ThemeContext";
 import { setInfoToast } from "~/store/reducers/geral";
 import { formatDecimal } from "~/utils/stringUtils";
 
@@ -15,7 +15,7 @@ export default function AddItems() {
   const { postApi } = useApi();
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
 
   const handleClose = () => {
     navigation.goBack();

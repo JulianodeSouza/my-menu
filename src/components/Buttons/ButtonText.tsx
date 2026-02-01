@@ -1,22 +1,24 @@
-import { StyleSheet, Text, TouchableOpacity, useColorScheme, ViewStyle } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { useTheme } from "~/contexts/ThemeContext";
+import { IButtonProps } from "~/types/buttons";
+import Icon from "../Icon";
 
-type ButtonProps = {
-  title: string;
-  iconStart?: React.ReactNode;
-  iconEnd?: React.ReactNode;
-  onPress?: () => void;
-  style?: ViewStyle;
-};
-
-export const ButtonText = ({ title, iconStart, iconEnd, onPress, style }: ButtonProps) => {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+export const ButtonText = ({
+  title,
+  iconStart,
+  iconEnd,
+  iconSize = 20,
+  onPress,
+  style,
+  iconColor,
+}: IButtonProps) => {
+  const { theme } = useTheme();
 
   return (
     <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
-      {iconStart}
+      {iconStart ? <Icon name={iconStart} size={iconSize} color={iconColor || theme.text} /> : null}
       <Text style={[styles.buttonText, { color: theme.text }]}>{title}</Text>
-      {iconEnd}
+      {iconEnd ? <Icon name={iconEnd} size={iconSize} color={iconColor || theme.text} /> : null}
     </TouchableOpacity>
   );
 };

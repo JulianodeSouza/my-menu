@@ -1,20 +1,23 @@
 import { forwardRef } from "react";
-import { StyleSheet, Text, TouchableOpacity, useColorScheme, View } from "react-native";
-import { darkTheme, lightTheme } from "theme";
-import { IButtonProps } from "~/types/Buttons";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useTheme } from "~/contexts/ThemeContext";
+import { IButtonProps } from "~/types/buttons";
+import Icon from "../Icon";
 
 export const ButtonPrimary = forwardRef<View, IButtonProps>(
-  ({ title, icon, ...buttonProps }, ref) => {
-    const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  ({ title, iconStart, iconEnd, iconSize, iconColor, ...buttonProps }, ref) => {
+    const { theme } = useTheme();
 
     return (
       <TouchableOpacity
-        ref={ref}        
+        ref={ref}
         {...buttonProps}
         style={[styles.button, buttonProps.style, { backgroundColor: theme.primary }]}>
-        {icon ? icon : null}
-
+        {iconStart ? (
+          <Icon name={iconStart} size={iconSize} color={iconColor || theme.text} />
+        ) : null}
         <Text style={[styles.buttonText, { color: theme.text }]}>{title}</Text>
+        {iconEnd ? <Icon name={iconEnd} size={iconSize} color={iconColor || theme.text} /> : null}
       </TouchableOpacity>
     );
   }
@@ -24,7 +27,6 @@ const styles = StyleSheet.create({
   button: {
     alignItems: "center",
     borderRadius: 24,
-    elevation: 5,
     flexDirection: "row",
     justifyContent: "center",
     padding: 16,
@@ -41,5 +43,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",
+    paddingHorizontal: 8,
   },
 });

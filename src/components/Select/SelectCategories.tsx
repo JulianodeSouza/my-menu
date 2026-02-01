@@ -1,8 +1,8 @@
-import { Picker } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import { useApi } from "~/ApiContext";
+import { Select } from ".";
 
-export default function SelectCategories({ value, handleChange }) {
+export default function SelectCategories({ value, handleChange, isRequired }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const apiContext = useApi();
@@ -24,16 +24,12 @@ export default function SelectCategories({ value, handleChange }) {
   }, []);
 
   return (
-    <Picker
-      style={{ backgroundColor: "#fff", borderWidth: 1, borderRadius: 10 }}
-      placeholder="Categoria"
-      selectedValue={value || ""}
-      onValueChange={(itemValue) => {
-        handleChange(itemValue);
-      }}>
-      {categories.map((category) => (
-        <Picker.Item key={category.id} value={category.id} label={category.name} />
-      ))}
-    </Picker>
+    <Select
+      label="Categoria"
+      options={categories.map((category) => ({ label: category.name, value: category.id }))}
+      value={value}
+      onChange={handleChange}
+      isRequired={isRequired}
+    />
   );
 }

@@ -1,7 +1,7 @@
 import { Portal, Modal as PaperModal } from "react-native-paper";
 import { ReactNode } from "react";
-import { StyleSheet, useColorScheme, View } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { StyleSheet, View } from "react-native";
+import { useTheme } from "~/contexts/ThemeContext";
 
 type ModalProps = {
   children: ReactNode;
@@ -10,7 +10,7 @@ type ModalProps = {
 };
 
 export const Modal = ({ children, visible, setVisible }: ModalProps) => {
-  const theme = useColorScheme() === "dark" ? darkTheme : lightTheme;
+  const { theme } = useTheme();
 
   const toggleOverlay = () => {
     setVisible({ open: !visible });
