@@ -1,4 +1,5 @@
-import { ExpoConfig, ConfigContext } from "expo/config";
+import { ConfigContext, ExpoConfig } from "expo/config";
+require("dotenv").config();
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -33,7 +34,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   splash: {
     image: "./assets/splash.png",
     resizeMode: "contain",
-    backgroundColor: "#121212",
+    backgroundColor: "#fafafa",
   },
   assetBundlePatterns: ["**/*"],
   ios: {
@@ -55,7 +56,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     // Variáveis de ambiente disponíveis no app
     appEnv: process.env.APP_ENV || "development",
-    apiUrl: process.env.API_URL,
-    apiPort: process.env.API_PORT,
+    apiUrl: process.env.API_URL || undefined, // Usado apenas em produção
+    apiPort: process.env.API_PORT || 3000,
   },
 });
