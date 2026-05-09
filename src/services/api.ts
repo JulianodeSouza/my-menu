@@ -2,7 +2,7 @@ import axios from "axios";
 import Constants from "expo-constants";
 
 const axiosInstance = axios.create({
-  timeout: 30000,
+  timeout: 3000,
   baseURL: getUrlBase(),
   headers: getHeaders(),
 });
