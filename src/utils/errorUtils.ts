@@ -206,9 +206,9 @@ export function getErrorMessage(
 
     // Sem conexão de rede
     if (
-      error.message === "Network Error" ||
+      error?.message === "Network Error" ||
       axiosError?.code === "ERR_NETWORK" ||
-      !navigator.onLine
+      (typeof navigator !== "undefined" && !navigator.onLine)
     ) {
       return {
         message: "Sem conexão com a internet. Verifique sua conexão Wi-Fi ou dados móveis.",
