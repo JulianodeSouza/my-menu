@@ -39,25 +39,22 @@ export async function remove(endpoint: string): Promise<any> {
 function getUrlBase(): string {
   // Usa a URL definida nas variáveis de ambiente
   const apiUrl = Constants.expoConfig?.extra?.apiUrl;
+  const apiPort = Constants.expoConfig?.extra?.apiPort || 3000;
+  const hostUri = Constants.expoConfig?.hostUri;
+  const debuggerHost = hostUri?.split(":")[0];
 
-  // Produção - usa a URL do ambiente
-  if (!__DEV__ || apiUrl) {
-    if (!apiUrl) {
-      console.warn("API_URL não está definida nas variáveis de ambiente!");
-    }
-    return apiUrl || "";
+  // Se apiUrl está explicitamente definida, usar
+  if (apiUrl) {
+    return apiUrl;
   }
 
-  // Desenvolvimento - Obtém o IP do host do Expo
-  const debuggerHost = Constants.expoConfig?.hostUri?.split(":")[0];
-
+  // Tentar usar debuggerHost (detection automática do Expo)
   if (debuggerHost) {
-    // Usa o IP detectado pelo Expo (funciona em dispositivos físicos e emuladores)
-    return `http://${debuggerHost}:${Constants.expoConfig?.extra?.apiPort}`;
+    return `http://${debuggerHost}:${apiPort}`;
   }
 
   // Fallback para emulador Android
-  return `http://10.0.2.2:${Constants.expoConfig?.extra?.apiPort}`;
+  return `http://10.0.2.2:${apiPort}`;
 }
 
 function getHeaders(): Record<string, string> {

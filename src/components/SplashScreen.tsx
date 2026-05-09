@@ -14,9 +14,71 @@ export const SplashScreen = ({ isVisible, onFinish }: SplashScreenProps) => {
   const { theme } = useTheme();
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const dot1Opacity = useRef(new Animated.Value(1)).current;
+  const dot2Opacity = useRef(new Animated.Value(0.7)).current;
+  const dot3Opacity = useRef(new Animated.Value(0.4)).current;
 
   useEffect(() => {
     if (!isVisible) return;
+
+    // Animação dos dots em loop
+    const animateDots = () => {
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(dot1Opacity, {
+            toValue: 0.4,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(dot2Opacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(dot3Opacity, {
+            toValue: 0.7,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.parallel([
+          Animated.timing(dot1Opacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(dot2Opacity, {
+            toValue: 0.4,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(dot3Opacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.parallel([
+          Animated.timing(dot1Opacity, {
+            toValue: 0.7,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(dot2Opacity, {
+            toValue: 0.7,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(dot3Opacity, {
+            toValue: 0.4,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start(() => {
+        animateDots();
+      });
+    };
 
     // Animação de escala e fade no início
     Animated.sequence([
@@ -27,20 +89,35 @@ export const SplashScreen = ({ isVisible, onFinish }: SplashScreenProps) => {
           useNativeDriver: true,
         }),
       ]),
-      // Espera 1.5 segundos
-      Animated.delay(1500),
-      // Fade out
+      // Inicia animação dos dots
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 0,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Inicia animação dos dots
+    animateDots();
+
+    // Timer para fade out e callback
+    const timer = setTimeout(() => {
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 500,
         useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onFinish?.();
-      // Reset para próximo uso
-      fadeAnim.setValue(1);
-      scaleAnim.setValue(1);
-    });
+      }).start(() => {
+        onFinish?.();
+        // Reset para próximo uso
+        fadeAnim.setValue(1);
+        scaleAnim.setValue(1);
+        dot1Opacity.setValue(1);
+        dot2Opacity.setValue(0.7);
+        dot3Opacity.setValue(0.4);
+      });
+    }, 3300); // 800ms (scale) + 1500ms (delay) + 1000ms (buffer)
+
+    return () => clearTimeout(timer);
   }, [isVisible]);
 
   if (!isVisible) return null;
@@ -99,29 +176,30 @@ export const SplashScreen = ({ isVisible, onFinish }: SplashScreenProps) => {
 
         {/* Loading Indicator */}
         <View style={styles.loadingContainer}>
-          <View
+          <Animated.View
             style={[
               styles.loadingDot,
               {
                 backgroundColor: theme.primary,
+                opacity: dot1Opacity,
               },
             ]}
           />
-          <View
+          <Animated.View
             style={[
               styles.loadingDot,
               {
                 backgroundColor: theme.primary,
-                opacity: 0.7,
+                opacity: dot2Opacity,
               },
             ]}
           />
-          <View
+          <Animated.View
             style={[
               styles.loadingDot,
               {
                 backgroundColor: theme.primary,
-                opacity: 0.4,
+                opacity: dot3Opacity,
               },
             ]}
           />
@@ -133,7 +211,7 @@ export const SplashScreen = ({ isVisible, onFinish }: SplashScreenProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 9999,
