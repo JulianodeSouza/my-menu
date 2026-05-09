@@ -1,6 +1,6 @@
-import { Card, Text } from "react-native-paper";
 import { useNavigation } from "expo-router";
 import { StyleSheet } from "react-native";
+import { Card, Text } from "react-native-paper";
 import { useDispatch } from "react-redux";
 import { useApi } from "~/ApiContext";
 import { Container } from "~/components/Container";
@@ -51,7 +51,7 @@ export default function AddItems() {
               Informe os dados do produto
             </Text>
 
-            <FormListPurchase {...{ handleClose, save }} />
+            <FormListPurchase {...{ handleClose, save }} formMode="register" />
           </Card.Content>
         </Card>
       </ScreenContent>

@@ -26,12 +26,6 @@ const THEME_OPTIONS: ThemeOptionConfig[] = [
     label: "Escuro",
     description: "Tema escuro",
   },
-  {
-    id: "auto" as ColorSchemeName,
-    label: "Automático",
-    icon: "Monitor",
-    description: "Segue o sistema",
-  },
 ];
 
 const STORAGE_KEY = "theme";
