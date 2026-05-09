@@ -22,9 +22,14 @@ export const ShoppingProvider: React.FC<ShoppingProviderProps> = ({ children }) 
 
   useEffect(() => {
     const fetchShoppingList = async () => {
-      const results = await getApi("list-supermarket");
-      setShoppingList(results);
-      setRefreshItems(false);
+      try {
+        const results = await getApi("list-supermarket");
+        setShoppingList(results);
+      } catch (error) {
+        console.error("Erro ao buscar lista de compras:", error);
+      } finally {
+        setRefreshItems(false);
+      }
     };
 
     if (loadItems || refreshItems) {
