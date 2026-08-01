@@ -9,11 +9,6 @@ Aplicativo mobile desenvolvido para facilitar a organização de listas de compr
 O **My Menu** foi criado com foco em praticidade no dia a dia.  
 A proposta é permitir que o usuário monte sua lista de compras, edite itens quando necessário e acompanhe os preços para visualizar o total da compra em tempo real.
 
-O projeto foi planejado inicialmente no Figma, definindo fluxos, telas e interações.
-
-🔗 **Protótipo no Figma:**  
-https://www.figma.com/file/vA65KfG5XJqgXhZddHpUSp/My-Menu?node-id=0%3A1&t=P8j1iYwZIq4qF8Ho-0
-
 ---
 
 ## ✨ Funcionalidades
@@ -38,9 +33,6 @@ https://www.figma.com/file/vA65KfG5XJqgXhZddHpUSp/My-Menu?node-id=0%3A1&t=P8j1iY
 ## 🧪 Tecnologias utilizadas
 
 - **React Native**
-
-> Se você quiser, posso depois complementar este README com versões de runtime, bibliotecas e ferramentas auxiliares assim que você compartilhar o `package.json`.
-
 ---
 
 ## 🚀 Como executar o projeto
@@ -88,47 +80,7 @@ O app foi pensado para usuários que desejam:
 
 ---
 
-## 📂 Estrutura esperada do projeto
-
-A estrutura pode variar conforme a versão atual, mas normalmente em projetos React Native você encontrará:
-
-- `src/` → código-fonte principal  
-- `components/` → componentes reutilizáveis  
-- `screens/` → telas do aplicativo  
-- `assets/` → imagens, ícones e recursos estáticos
-
----
-
-## 🛠️ Melhorias futuras (roadmap)
-
-- [ ] Persistência de dados local (AsyncStorage/SQLite)
-- [ ] Histórico de compras anteriores
-- [ ] Categorização de produtos (higiene, alimentos, limpeza...)
-- [ ] Compartilhamento de lista
-- [ ] Tema escuro
-
----
-
-## 🤝 Contribuição
-
-Contribuições são bem-vindas!
-
-1. Faça um fork do projeto  
-2. Crie uma branch para sua feature (`git checkout -b feature/minha-feature`)  
-3. Commit suas alterações (`git commit -m 'feat: minha nova feature'`)  
-4. Push para a branch (`git push origin feature/minha-feature`)  
-5. Abra um Pull Request
-
----
-
 ## 👨‍💻 Autor
 
 Desenvolvido por **Juliano de Souza**.  
-Se quiser, posso também montar uma seção de contato com LinkedIn, GitHub e e-mail.
-
 ---
-
-## 📄 Licença
-
-Este projeto está sob a licença que você definir.  
-Se desejar, posso incluir uma licença MIT completa no repositório.
