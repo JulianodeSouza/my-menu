@@ -1,8 +1,8 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
-import { borderRadius, spacing } from "theme";
 import { ScreenContent } from "~/components/ScreenContent";
 import { useTheme } from "~/contexts/ThemeContext";
 import { ICardShop } from "~/types/shopList";
+import { borderRadius, spacing } from "../../theme";
 
 export default function CardShop(props: ICardShop) {
   const { theme } = useTheme();

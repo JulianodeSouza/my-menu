@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { spacing } from "theme";
 import { useTheme } from "~/contexts/ThemeContext";
+import { spacing } from "../../theme";
 
 export const Container = ({ children }: { children: ReactNode }) => {
   const { theme } = useTheme();

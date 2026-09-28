@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { borderRadius, fontWeights, spacing, typography } from "theme";
 import { useApi } from "~/ApiContext";
 import Icon from "~/components/Icon";
 import { TextComponent } from "~/components/Text";
 import { useTheme } from "~/contexts/ThemeContext";
 import { CategorieProps } from "~/types/categories";
+import { borderRadius, fontWeights, spacing, typography } from "../../../theme";
 
 export default function Categories() {
   const { theme } = useTheme();

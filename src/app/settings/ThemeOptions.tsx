@@ -1,10 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useMemo, useState } from "react";
 import { Appearance, ColorSchemeName, StyleSheet, TouchableOpacity, View } from "react-native";
-import { borderRadius, fontWeights, spacing, typography } from "theme";
 import Icon from "~/components/Icon";
 import { TextComponent } from "~/components/Text";
 import { useTheme } from "~/contexts/ThemeContext";
+import { borderRadius, fontWeights, spacing, typography } from "../../../theme";
 
 type ThemeOptionConfig = {
   id: ColorSchemeName;

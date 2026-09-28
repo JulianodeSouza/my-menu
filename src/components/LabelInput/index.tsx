@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
-import { fontWeights, spacing, typography } from "theme";
 import { useTheme } from "~/contexts/ThemeContext";
+import { fontWeights, spacing, typography } from "../../../theme";
 import { TextComponent } from "../Text";
 
 interface LabelInputProps {

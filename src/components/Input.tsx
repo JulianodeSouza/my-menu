@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
-import { borderRadius, spacing } from "theme";
 import { useTheme } from "~/contexts/ThemeContext";
 import { InputProps } from "~/types/input";
 import { onlyNumbers } from "~/utils/stringUtils";
+import { borderRadius, spacing } from "../../theme";
 import LabelInput from "./LabelInput";
 import { TextComponent } from "./Text";
 

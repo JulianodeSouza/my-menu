@@ -1,8 +1,8 @@
 import { StyleSheet } from "react-native";
 import { Dialog, Portal, Text } from "react-native-paper";
-import { fontWeights, spacing, typography } from "theme";
 import { useModalConfirmation } from "~/contexts/DialogContext";
 import { useTheme } from "~/contexts/ThemeContext";
+import { fontWeights, spacing, typography } from "../../../theme";
 import { ButtonPrimary } from "../Buttons/ButtonPrimary";
 import { ButtonText } from "../Buttons/ButtonText";
 

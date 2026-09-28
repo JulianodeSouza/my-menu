@@ -2,9 +2,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { borderRadius, fontWeights, spacing } from "theme";
 import { useTheme } from "~/contexts/ThemeContext";
 import { setInfoToast } from "~/store/reducers/geral";
+import { borderRadius, fontWeights, spacing } from "../../theme";
 import { TextComponent } from "./Text";
 
 export const Toast = () => {

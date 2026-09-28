@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, ViewStyle } from "react-native";
-import { borderRadius, fontWeights, spacing, typography } from "theme";
 import { useTheme } from "~/contexts/ThemeContext";
-import { IButtonProps } from "~/types/buttons";
+import { IButtonProps } from "~/types/Buttons";
+import { borderRadius, fontWeights, spacing, typography } from "../../../theme";
 import Icon from "../Icon";
 
 type ButtonProps = {

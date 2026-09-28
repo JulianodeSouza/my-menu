@@ -1,5 +1,4 @@
 import { StyleSheet, View } from "react-native";
-import { typography } from "theme";
 import CardShop from "~/components/CardShop";
 import Icon from "~/components/Icon";
 import { ScreenContent } from "~/components/ScreenContent";
@@ -8,6 +7,7 @@ import { useShoppingContext } from "~/contexts/ShoppingContext";
 import { useTheme } from "~/contexts/ThemeContext";
 import { formatNumberToMonetary } from "~/utils/stringUtils";
 import { getLengthTotalOfList, getTotalMarkedItems } from "~/utils/sumUtils";
+import { typography } from "../../../theme";
 
 export default function ShoppingStatus() {
   const { theme } = useTheme();

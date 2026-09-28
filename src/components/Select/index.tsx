@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { borderRadius, spacing, typography } from "theme";
 import { useTheme } from "~/contexts/ThemeContext";
 import { SelectProps } from "~/types/select";
+import { borderRadius, spacing, typography } from "../../../theme";
 import LabelInput from "../LabelInput";
 
 export const Select: React.FC<SelectProps> = ({
