@@ -16,6 +16,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-router",
     "expo-font",
     "expo-web-browser",
+    "expo-splash-screen",
+    "expo-status-bar",
     [
       "expo-build-properties",
       {

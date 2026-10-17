@@ -16,7 +16,7 @@ export const ButtonSecondary = forwardRef<View, IButtonProps>(
         {iconStart ? (
           <Icon name={iconStart} size={iconSize} color={iconColor || theme.text} />
         ) : null}
-        <Text style={[styles.buttonText]}>{title}</Text>
+        <Text style={[styles.buttonText, { color: theme.text }]}>{title}</Text>
         {iconEnd ? <Icon name={iconEnd} size={iconSize} color={iconColor || theme.text} /> : null}
       </TouchableOpacity>
     );
@@ -40,7 +40,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   buttonText: {
-    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",

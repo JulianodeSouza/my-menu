@@ -67,6 +67,19 @@ npx react-native run-ios
 npx react-native start
 ```
 
+### Gerar um build
+
+O comando abaixo pergunta o tipo de build e a plataforma antes de iniciar o EAS Build:
+
+```bash
+npm run build
+```
+
+Escolha entre:
+
+- **Tipo do build:** Produção ou Desenvolvimento
+- **Plataforma:** Android, iOS ou Ambos
+
 ---
 
 ## 📱 Objetivo de uso

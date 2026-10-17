@@ -60,25 +60,42 @@ export interface ErrorMessage {
  * @param data - Dados da resposta do servidor
  * @returns Mensagem de erro ou null se não encontrou
  */
+function isHtmlString(value: string): boolean {
+  const trimmed = value.trim().toLowerCase();
+  return (
+    trimmed.startsWith("<!doctype html") ||
+    trimmed.startsWith("<html") ||
+    /<\/?[a-z][\s\S]*>/i.test(trimmed)
+  );
+}
+
 function extractErrorMessage(data: ServerErrorResponse | any): string | null {
   if (!data) return null;
 
-  // 1. data.message (string)
+  // 1. Formato da API: { data: { message: "..." } }
+  if (typeof data?.data?.message === "string" && data.data.message.trim()) {
+    return data.data.message;
+  }
+
+  // 2. data.message (string)
   if (typeof data.message === "string" && data.message.trim()) {
     return data.message;
   }
 
-  // 2. data.error (string)
+  // 3. data.error (string)
   if (typeof data.error === "string" && data.error.trim()) {
     return data.error;
   }
 
-  // 3. data é uma string
+  // 4. data é uma string (ignora páginas HTML como 502/504 do Nginx)
   if (typeof data === "string" && data.trim()) {
+    if (isHtmlString(data)) {
+      return null;
+    }
     return data;
   }
 
-  // 4. data é um array de strings ou objetos com message
+  // 5. data é um array de strings ou objetos com message
   if (Array.isArray(data) && data.length > 0) {
     const firstError = data[0];
     if (typeof firstError === "string" && firstError.trim()) {
@@ -89,7 +106,7 @@ function extractErrorMessage(data: ServerErrorResponse | any): string | null {
     }
   }
 
-  // 5. data.errors é um array
+  // 6. data.errors é um array
   if (Array.isArray(data.errors) && data.errors.length > 0) {
     const firstError = data.errors[0];
     if (typeof firstError === "string" && firstError.trim()) {
@@ -123,24 +140,12 @@ export function getErrorMessage(
     delete: "Não conseguimos deletar os dados. Tente novamente.",
   };
 
-  // Se o servidor respondeu com uma mensagem de erro
+  // Se o servidor respondeu com uma mensagem de erro estruturada (não genérica de 5xx)
   if (axiosError?.response?.data) {
     const errorMessage = extractErrorMessage(axiosError.response.data);
-    if (errorMessage) {
+    if (errorMessage && errorMessage !== "Internal Server Error") {
       return {
         message: errorMessage,
-        type: "error",
-      };
-    }
-
-    // Fallback para statusText
-    if (
-      axiosError.response.statusText &&
-      axiosError.response.statusText !== "Unknown" &&
-      axiosError.response.statusText.trim()
-    ) {
-      return {
-        message: axiosError.response.statusText,
         type: "error",
       };
     }
@@ -188,7 +193,7 @@ export function getErrorMessage(
     if (status >= 500) {
       return {
         message:
-          "Nossos servidores estão temporariamente indisponíveis. Tente novamente em alguns momentos.",
+          "Nossos servidores estão temporariamente indisponíveis. Tente novamente em alguns minutos.",
         type: "error",
       };
     }
