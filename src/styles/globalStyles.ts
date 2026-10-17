@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { borderRadius, spacing } from "theme";
+import { borderRadius, spacing } from "../../theme";
 
 /**
  * Estilos globais utilitários para uso em toda a aplicação.

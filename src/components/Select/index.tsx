@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { borderRadius, spacing, typography } from "theme";
 import { useTheme } from "~/contexts/ThemeContext";
 import { SelectProps } from "~/types/select";
+import { borderRadius, spacing, typography } from "../../../theme";
 import LabelInput from "../LabelInput";
 
 export const Select: React.FC<SelectProps> = ({
@@ -14,6 +14,8 @@ export const Select: React.FC<SelectProps> = ({
   optionStyle,
   labelStyle,
   isRequired,
+  error,
+  textError,
 }) => {
   const { theme } = useTheme();
   const [visible, setVisible] = useState(false);
@@ -27,13 +29,16 @@ export const Select: React.FC<SelectProps> = ({
     <View style={[styles.container, style]}>
       {label && <LabelInput text={label} style={labelStyle} isRequired={isRequired} />}
       <TouchableOpacity
-        style={[styles.selectBox, style, { borderColor: theme.border }]}
+        style={[styles.selectBox, style, { borderColor: error ? theme.error : theme.border }]}
         onPress={() => setVisible(true)}
         activeOpacity={0.8}>
         <Text style={[styles.selectedText, { color: theme.text }]}>
           {selected ? selected.label : "Selecione..."}
         </Text>
       </TouchableOpacity>
+      {error && (
+        <Text style={[styles.errorMessage, { color: theme.error }]}>{textError}</Text>
+      )}
       <Modal
         visible={visible}
         transparent
@@ -102,6 +107,9 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: typography.fontSizeBase,
+  },
+  errorMessage: {
+    marginBottom: spacing.md,
   },
 });
 

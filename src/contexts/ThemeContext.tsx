@@ -1,6 +1,6 @@
-import { createContext, useContext, ReactNode, useMemo } from "react";
+import { createContext, ReactNode, useContext, useMemo } from "react";
 import { useColorScheme } from "react-native";
-import { darkTheme, lightTheme } from "theme";
+import { darkTheme, lightTheme } from "../../theme";
 
 type Theme = typeof lightTheme;
 

@@ -1,9 +1,9 @@
 import { StyleSheet, View } from "react-native";
-import { typography } from "theme";
 import Icon from "~/components/Icon";
 import { ScreenContent } from "~/components/ScreenContent";
 import { TextComponent } from "~/components/Text";
 import { useTheme } from "~/contexts/ThemeContext";
+import { typography } from "../../../theme";
 
 export default function EmptyList() {
   const { theme } = useTheme();

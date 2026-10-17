@@ -5,13 +5,15 @@ import {
   Modal,
   PanResponder,
   Pressable,
+  ScrollView,
   StyleSheet,
   View,
+  useWindowDimensions,
 } from "react-native";
-import { borderRadius, fontWeights, shadows, spacing, typography } from "theme";
 import Icon from "~/components/Icon";
 import { TextComponent } from "~/components/Text";
 import { useTheme } from "~/contexts/ThemeContext";
+import { borderRadius, fontWeights, shadows, spacing, typography } from "../../../theme";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -39,6 +41,7 @@ export function SheetModal({
   showCloseButton = true,
 }: SheetModalProps) {
   const { theme } = useTheme();
+  const { height: windowHeight } = useWindowDimensions();
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
 
@@ -161,7 +164,9 @@ export function SheetModal({
           <Pressable style={styles.overlayPressable} onPress={handleClose} />
         </Animated.View>
 
-        <Animated.View style={getContentStyle()} {...(isVertical ? panResponder.panHandlers : {})}>
+        <Animated.View
+          style={[getContentStyle(), { display: "flex", flexDirection: "column" }]}
+          {...(isVertical ? panResponder.panHandlers : {})}>
           {side === "bottom" && (
             <View style={[styles.dragIndicator, { backgroundColor: theme.textMuted }]} />
           )}
@@ -196,7 +201,17 @@ export function SheetModal({
             </View>
           )}
 
-          <View style={styles.body}>{children}</View>
+          <ScrollView
+            style={styles.body}
+            showsVerticalScrollIndicator={true}
+            scrollEventThrottle={16}
+            nestedScrollEnabled={true}
+            keyboardShouldPersistTaps="handled"
+            removeClippedSubviews={true}
+            scrollEnabled={true}
+            keyboardDismissMode="on-drag">
+            {children}
+          </ScrollView>
         </Animated.View>
       </View>
     </Modal>
@@ -246,7 +261,10 @@ const styles = StyleSheet.create({
   },
   content: {
     ...shadows.lg,
-    maxHeight: "80%",
+    maxHeight: "90%",
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
   },
   contentBottom: {
     position: "absolute",
@@ -321,7 +339,10 @@ const styles = StyleSheet.create({
   },
   body: {
     paddingHorizontal: spacing.base,
-    paddingBottom: spacing.xl,
+    paddingTop: spacing.base,
+    paddingBottom: spacing.base,
+    flex: 1,
+    minHeight: 0,
   },
   sectionHeader: {
     flexDirection: "column",

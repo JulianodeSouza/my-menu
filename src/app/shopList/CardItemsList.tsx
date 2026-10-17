@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import { LayoutAnimation, StyleSheet, View } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { useDispatch } from "react-redux";
-import { borderRadius, fontWeights, spacing, typography } from "theme";
 import { useApi } from "~/ApiContext";
 import { ButtonText } from "~/components/Buttons/ButtonText";
 import CardShop from "~/components/CardShop";
@@ -15,9 +14,10 @@ import { setInfoToast } from "~/store/reducers/geral";
 import { IListPurchase, IListPurchaseView } from "~/types/shopList";
 import { formatNumberToMonetary } from "~/utils/stringUtils";
 import { calculateProgress, calculateValuesByMeasuredUnits } from "~/utils/sumUtils";
+import { borderRadius, fontWeights, spacing, typography } from "../../../theme";
 import DialogItem from "./DialogItem";
 
-type ModalMode = "edit" | "mark";
+type ModalMode = "edit";
 
 type EditionModalProps = {
   open: boolean;
@@ -66,7 +66,7 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
             item.unitSymbol
           );
         } else if (item.checked && (!item.amount || (!item.totalCaught && !item.quantity))) {
-          setSheetModalInfo({ open: true, item, mode: "mark" });
+          setSheetModalInfo({ open: true, item, mode: "edit" });
           havePendingInfo = true;
           break;
         }
@@ -237,25 +237,12 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
                 </View>
               </View>
               <View style={styles.buttonsContainer}>
-                <View>
-                  {!!item.checked && (
-                    <TextComponent style={[styles.itemTotal, { color: theme.textMuted }]}>
-                      {formatNumberToMonetary(
-                        calculateValuesByMeasuredUnits(
-                          item.amount || 0,
-                          item.totalCaught,
-                          item.unitSymbol
-                        )
-                      )}
-                    </TextComponent>
-                  )}
-                </View>
-                {/* <ButtonText
+                <ButtonText
                   title=""
                   iconStart="Pen"
                   iconSize={15}
                   onPress={() => setSheetModalInfo({ open: true, item, mode: "edit" })}
-                /> */}
+                />
                 <ButtonText
                   title=""
                   iconStart="Trash2"
@@ -274,17 +261,15 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
       {sheetModalInfo.open && (
         <DialogItem
           {...{
-            mode: sheetModalInfo.mode === "edit" ? "edit" : "mark",
-            title: sheetModalInfo.mode === "edit" ? "Editar Item" : "Informações do item",
+            mode: "edit",
+            title: "Editar Item",
             isEdit: sheetModalInfo.mode === "edit",
             infoDialog: sheetModalInfo,
             onClose() {
               setSheetModalInfo({ open: false });
             },
-            handleActionForm(values, mode) {
-              if (mode === "mark") {
-                registerItemPurchase(values);
-              }
+            handleActionForm(values) {
+              registerItemPurchase(values);
             },
           }}
         />
