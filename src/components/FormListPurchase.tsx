@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFormik } from "formik";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { Keyboard, StyleSheet, View } from "react-native";
@@ -9,6 +8,7 @@ import { useTheme } from "~/contexts/ThemeContext";
 import { FormValuesProps } from "~/types/formListPurchase";
 import { PropsForm } from "~/types/forms";
 import { IMeasuredUnit } from "~/types/measuredUnit";
+import { loadMeasuredUnits } from "~/utils/cacheFunctions";
 import {
   formatDecimal,
   formatNumberToMonetary,
@@ -21,11 +21,12 @@ import SelectMeasuredUnits from "./Select/SelectMeasuredUnits";
 import { TextComponent } from "./Text";
 
 export interface FormListPurchaseRef {
-  submit: () => Promise<void>;
+  submit: () => Promise<boolean>;
+  reset: () => void;
 }
 
 export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurchase(
-  { save, isEdit, item, formMode, secondaryAction }: PropsForm,
+  { save, isEdit, item, formMode }: PropsForm,
   ref
 ) {
   const [previewTotalPurchase, setPreviewTotalPurchase] = useState(0);
@@ -33,9 +34,9 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
 
   const initialState: FormValuesProps = {
     name: "",
-    category: 1,
+    category: 0,
     quantity: 0,
-    measuredUnit: 1,
+    measuredUnit: 0,
     totalCaught: 0,
     amount: 0,
   };
@@ -56,6 +57,11 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
             .positive("Selecione uma categoria válida"),
           quantity: yup
             .number()
+            .transform((value, originalValue) =>
+              typeof originalValue === "string"
+                ? Number(originalValue.replace(",", "."))
+                : value
+            )
             .typeError("Informe a quantidade")
             .required("Informe a quantidade")
             .positive("A quantidade deve ser maior que zero"),
@@ -79,6 +85,11 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
             then: () =>
               yup
                 .number()
+                .transform((value, originalValue) =>
+                  typeof originalValue === "string"
+                    ? Number(originalValue.replace(",", "."))
+                    : value
+                )
                 .typeError("Informe a quantidade pega")
                 .required("Informe a quantidade pega")
                 .min(0.01, "A quantidade pega deve ser maior que zero"),
@@ -107,7 +118,7 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
         amount: amountNumber,
       };
 
-      save(valuesFormatted);
+      await save(valuesFormatted);
     },
   });
 
@@ -127,9 +138,13 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
 
         // Se não houver erros, faz o submit
         if (Object.keys(errors).length === 0) {
-          formik.handleSubmit();
+          await formik.submitForm();
+          return true;
         }
+
+        return false;
       },
+      reset: () => formik.resetForm(),
     }),
     [formik]
   );
@@ -150,15 +165,21 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
     }
   }, [isEdit, item, formMode]);
 
-  const handleCategoryChange = useCallback((value: number) => {
-    formik.setFieldValue("category", value);
-    formik.setFieldTouched("category", true);
-  }, []);
+  const handleCategoryChange = useCallback(
+    async (value: number) => {
+      await formik.setFieldValue("category", value, false);
+      await formik.setFieldTouched("category", true, true);
+    },
+    [formik]
+  );
 
-  const handleMeasuredUnitChange = useCallback((value: number) => {
-    formik.setFieldValue("measuredUnit", value);
-    formik.setFieldTouched("measuredUnit", true);
-  }, []);
+  const handleMeasuredUnitChange = useCallback(
+    async (value: number) => {
+      await formik.setFieldValue("measuredUnit", value, false);
+      await formik.setFieldTouched("measuredUnit", true, true);
+    },
+    [formik]
+  );
 
   useEffect(() => {
     const keyboardWillHide = Keyboard.addListener("keyboardWillHide", () => {
@@ -175,14 +196,13 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
       const quantity = formatDecimal(formik.values.totalCaught || formik.values.quantity);
       const amountValue = onlyNumbers(String(formik.values.amount));
       const amountNumber = amountValue ? parseInt(amountValue, 10) / 100 : 0;
-      const measuredUnitCache: IMeasuredUnit[] = JSON.parse(
-        await AsyncStorage.getItem("measuredUnits")
-      );
-      const measuredUnit: IMeasuredUnit = measuredUnitCache.find(
+      const measuredUnitCache: IMeasuredUnit[] = await loadMeasuredUnits();
+
+      const measuredUnit: IMeasuredUnit = measuredUnitCache?.find(
         (unit) => unit.id === formik.values.measuredUnit
       );
 
-      const total = calculateValuesByMeasuredUnits(amountNumber, quantity, measuredUnit.unitSymbol);
+      const total = calculateValuesByMeasuredUnits(amountNumber, quantity, measuredUnit?.unitSymbol);
 
       setPreviewTotalPurchase(total);
     };
@@ -211,8 +231,10 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
 
       <SelectCategories
         isRequired
-        value={formik.values.category}
+        value={String(formik.values.category)}
         handleChange={handleCategoryChange}
+        error={formik.touched.category && Boolean(formik.errors.category)}
+        textError={formik.errors.category}
       />
 
       <View
@@ -238,8 +260,10 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
         <View style={{ flex: 1 }}>
           <SelectMeasuredUnits
             isRequired
-            value={formik.values.measuredUnit}
+            value={String(formik.values.measuredUnit)}
             handleChange={handleMeasuredUnitChange}
+            error={formik.touched.measuredUnit && Boolean(formik.errors.measuredUnit)}
+            textError={formik.errors.measuredUnit}
           />
         </View>
       </View>

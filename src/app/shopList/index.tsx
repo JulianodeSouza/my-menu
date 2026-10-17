@@ -38,8 +38,6 @@ export default function ShopList() {
   );
 
   const save = async (values) => {
-    setNewItemModal({ open: false });
-
     const data = {
       name: values.name.trim(),
       quantity: formatDecimal(values.quantity),
@@ -94,11 +92,11 @@ export default function ShopList() {
         </ScrollContent>
 
         <View style={styles.footer}>
-          {anyItemMarked && (
-            <View style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
+          <View>
+            {anyItemMarked && (
               <ButtonTextSecondary title="Finalizar compra" onPress={finishPurchase} />
-            </View>
-          )}
+            )}
+          </View>
 
           <FloatingButton
             color="green"

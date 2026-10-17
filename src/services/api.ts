@@ -1,8 +1,9 @@
 import axios from "axios";
 import Constants from "expo-constants";
+import { Platform } from "react-native";
 
 const axiosInstance = axios.create({
-  timeout: 30000,
+  timeout: 5000,
   baseURL: getUrlBase(),
   headers: getHeaders(),
 });
@@ -39,7 +40,7 @@ export async function remove(endpoint: string): Promise<any> {
 function getUrlBase(): string {
   // Usa a URL definida nas variáveis de ambiente
   const apiUrl = Constants.expoConfig?.extra?.apiUrl;
-  const apiPort = Constants.expoConfig?.extra?.apiPort || 3000;
+  const apiPort = Constants.expoConfig?.extra?.apiPort;
   const hostUri = Constants.expoConfig?.hostUri;
   const debuggerHost = hostUri?.split(":")[0];
 
@@ -48,7 +49,10 @@ function getUrlBase(): string {
     return apiUrl;
   }
 
-  // Tentar usar debuggerHost (detection automática do Expo)
+  if (Platform.OS === "android" && !Constants.isDevice) {
+    return `http://10.0.2.2:${apiPort}`;
+  }
+
   if (debuggerHost) {
     return `http://${debuggerHost}:${apiPort}`;
   }

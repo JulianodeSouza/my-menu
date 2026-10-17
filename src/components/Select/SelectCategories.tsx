@@ -1,35 +1,30 @@
 import { useEffect, useState } from "react";
-import { useApi } from "~/ApiContext";
+import { loadCategories } from "~/utils/cacheFunctions";
+import { CategorieProps } from "~/types/categories";
 import { Select } from ".";
 
-export default function SelectCategories({ value, handleChange, isRequired }) {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const apiContext = useApi();
+export default function SelectCategories({
+  value,
+  handleChange,
+  isRequired,
+  error,
+  textError,
+}) {
+  const [categories, setCategories] = useState<CategorieProps[]>([]);
 
   useEffect(() => {
-    const loadCategories = async () => {
-      const result = await apiContext.getApi("categories");
-      setCategories(result);
-    };
-
-    if (loading) {
-      setLoading(false);
-      loadCategories();
-    }
-  }, [loading]);
-
-  useEffect(() => {
-    setLoading(true);
+    loadCategories().then(setCategories);
   }, []);
 
   return (
     <Select
       label="Categoria"
-      options={categories.map((category) => ({ label: category.name, value: category.id }))}
+      options={categories.map((category) => ({ label: category.name, value: String(category.id) }))}
       value={value}
-      onChange={handleChange}
+      onChange={(selectedValue) => handleChange(Number(selectedValue))}
       isRequired={isRequired}
+      error={error}
+      textError={textError}
     />
   );
 }

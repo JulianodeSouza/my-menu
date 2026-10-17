@@ -14,4 +14,6 @@ export type SelectProps = {
   optionStyle?: ViewStyle;
   labelStyle?: TextStyle;
   isRequired?: boolean;
+  error?: boolean;
+  textError?: string;
 };
