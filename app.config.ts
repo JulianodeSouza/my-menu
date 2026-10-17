@@ -40,6 +40,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
+    bundleIdentifier: "com.mymenu",
   },
   android: {
     adaptiveIcon: {
