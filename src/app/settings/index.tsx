@@ -14,7 +14,7 @@ export default function Settings() {
         <HeaderScreen title="Configurações" />
         <Divider />
 
-        <Container>
+        <Container testID="settings-screen">
           <ScreenContent>
             <ThemeOptions />
             <Divider />

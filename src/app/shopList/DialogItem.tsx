@@ -86,10 +86,15 @@ export default function DialogItem({
         />
         <View style={styles.footerButtons}>
           <View style={styles.buttonWrapper}>
-            <ButtonSecondary onPress={handleSecondaryAction} title={getButtonTexts().secondary} />
+            <ButtonSecondary
+              testID="shoplist-form-btn-save-continue"
+              onPress={handleSecondaryAction}
+              title={getButtonTexts().secondary}
+            />
           </View>
           <View style={styles.buttonWrapper}>
             <ButtonPrimary
+              testID="shoplist-form-btn-save"
               onPress={handlePrimaryAction}
               title={getButtonTexts().primary}
             />

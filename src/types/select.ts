@@ -16,4 +16,5 @@ export type SelectProps = {
   isRequired?: boolean;
   error?: boolean;
   textError?: string;
+  testID?: string;
 };

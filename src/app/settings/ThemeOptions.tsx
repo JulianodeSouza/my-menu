@@ -58,6 +58,7 @@ function ThemeOptionItem({ option, isSelected, onSelect }: ThemeOptionItemProps)
 
   return (
     <TouchableOpacity
+      testID={`settings-theme-option-${option.id}`}
       style={[
         styles.optionContainer,
         dynamicStyles.container,

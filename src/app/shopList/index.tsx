@@ -60,7 +60,7 @@ export default function ShopList() {
 
   return (
     <>
-      <Container>
+      <Container testID="shoplist-container">
         <ScrollContent
           refreshing={refreshItems}
           onRefreshControl={() => {
@@ -69,7 +69,7 @@ export default function ShopList() {
           <ShoppingStatus />
 
           {shoppingList.length === 0 && (
-            <View style={styles.emptyContainer}>
+            <View testID="shoplist-empty-state" style={styles.emptyContainer}>
               <EmptyList />
             </View>
           )}
@@ -94,11 +94,16 @@ export default function ShopList() {
         <View style={styles.footer}>
           <View>
             {anyItemMarked && (
-              <ButtonTextSecondary title="Finalizar compra" onPress={finishPurchase} />
+              <ButtonTextSecondary
+                testID="shoplist-btn-finish-purchase"
+                title="Finalizar compra"
+                onPress={finishPurchase}
+              />
             )}
           </View>
 
           <FloatingButton
+            testID="shoplist-btn-add-item"
             color="green"
             onPress={() => {
               setNewItemModal({ open: true });

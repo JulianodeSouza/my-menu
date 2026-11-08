@@ -1,0 +1,60 @@
+appId: com.mymenu
+---
+# Fluxo E2E: Usabilidade da Lista de Compras
+- launchApp:
+    clearState: false
+
+# 1. Aguarda a tela principal carregar
+- assertVisible:
+    id: "shoplist-container"
+
+# 2. Abre o modal para adicionar novo item
+- tapOn:
+    id: "shoplist-btn-add-item"
+
+# 3. Preenche o formulário do item (com campos obrigatórios conforme RN02)
+- assertVisible:
+    id: "shoplist-form-input-name"
+- tapOn:
+    id: "shoplist-form-input-name"
+- inputText: "Maçã Gala"
+
+# Seleciona Categoria
+- tapOn:
+    id: "shoplist-form-select-category"
+- tapOn: "Hortifruti"
+
+# Preenche Quantidade
+- tapOn:
+    id: "shoplist-form-input-quantity"
+- inputText: "2"
+
+# Seleciona Unidade de Medida
+- tapOn:
+    id: "shoplist-form-select-unit"
+- tapOn: "Quilograma"
+
+# 4. Salva o item
+- tapOn:
+    id: "shoplist-form-btn-save"
+
+# 5. Expande a categoria para exibir o item (RN01)
+- tapOn: "Hortifruti"
+- assertVisible: "Maçã Gala"
+
+# 6. Marca o item como pego (RN03)
+- tapOn:
+    id: "shoplist-item-checkbox"
+
+- runFlow:
+    when:
+      visible: "Marcar item"
+    commands:
+      - tapOn: "Marcar item"
+
+# 7. Verifica se o botão de finalizar compra ficou visível (RN05)
+- assertVisible:
+    id: "shoplist-btn-finish-purchase"
+
+# 8. Tira screenshot de comprovação do teste
+- takeScreenshot: "evidencia-lista-compra-sucesso"

@@ -52,25 +52,36 @@ export default function MeasuredUnits() {
     const trimmedSymbol = unitSymbol.trim();
     if (!trimmedName || !trimmedSymbol) return;
 
-    const data = { name: trimmedName, unitSymbol: trimmedSymbol };
-    if (editingUnit) {
-      await putApi(`measuredUnits/${editingUnit.id}`, data);
-    } else {
-      await postApi("measuredUnits", data);
-    }
+    try {
+      const data = { name: trimmedName, unitSymbol: trimmedSymbol };
+      if (editingUnit) {
+        await putApi(`measuredUnits/${editingUnit.id}`, data);
+      } else {
+        await postApi("measuredUnits", data);
+      }
 
-    await removeItemCache("measuredUnits");
-    setModalVisible(false);
-    await loadData();
-    dispatch(
-      setInfoToast({
-        open: true,
-        message: editingUnit
-          ? "Unidade atualizada com sucesso"
-          : "Unidade adicionada com sucesso",
-        type: "success",
-      })
-    );
+      await removeItemCache("measuredUnits");
+      setModalVisible(false);
+      await loadData();
+      dispatch(
+        setInfoToast({
+          open: true,
+          message: editingUnit
+            ? "Unidade atualizada com sucesso"
+            : "Unidade adicionada com sucesso",
+          type: "success",
+        })
+      );
+    } catch (error: any) {
+      console.error("Erro ao salvar unidade:", error);
+      dispatch(
+        setInfoToast({
+          open: true,
+          message: error?.response?.data?.message || "Erro ao salvar unidade de medida",
+          type: "error",
+        })
+      );
+    }
   };
 
   const removeUnit = (unit: IMeasuredUnit) => {
@@ -102,7 +113,7 @@ export default function MeasuredUnits() {
             <TextComponent style={styles.title}>Unidades de medida</TextComponent>
             <TextComponent style={styles.subtitle}>Defina como seus produtos são medidos</TextComponent>
           </View>
-          <ButtonText title="Adicionar" iconStart="Plus" onPress={openCreate} />
+          <ButtonText testID="settings-unit-btn-add" title="Adicionar" iconStart="Plus" onPress={openCreate} />
         </View>
         <View style={styles.listContainer}>
           <View style={{ flex: 1 }}>

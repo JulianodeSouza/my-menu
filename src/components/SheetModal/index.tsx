@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   overlayPressable: {
     flex: 1,

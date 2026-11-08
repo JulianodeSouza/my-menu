@@ -1,0 +1,40 @@
+appId: com.mymenu
+---
+# Fluxo E2E: Gestão de Categorias nas Configurações
+- launchApp:
+    clearState: false
+
+# 1. Navega para a tela de configurações a partir do cabeçalho
+- assertVisible:
+    id: "header-btn-settings"
+- tapOn:
+    id: "header-btn-settings"
+
+# 2. Confirma que está na tela de configurações
+- assertVisible:
+    id: "settings-screen"
+
+# 3. Toca em Adicionar Categoria
+- assertVisible:
+    id: "settings-category-btn-add"
+- tapOn:
+    id: "settings-category-btn-add"
+
+# 4. Digita o nome da categoria no modal
+- assertVisible:
+    id: "settings-category-input-name"
+- tapOn:
+    id: "settings-category-input-name"
+- inputText: "Laticínios"
+
+# 5. Salva a nova categoria
+- tapOn:
+    id: "settings-category-btn-save"
+
+# 6. Confirma que o modal foi fechado e a categoria aparece na tela
+- assertNotVisible:
+    id: "settings-category-input-name"
+- assertVisible: "Laticínios"
+
+# 7. Screenshot de evidência
+- takeScreenshot: "evidencia-categoria-adicionada"

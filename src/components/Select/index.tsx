@@ -16,6 +16,7 @@ export const Select: React.FC<SelectProps> = ({
   isRequired,
   error,
   textError,
+  testID,
 }) => {
   const { theme } = useTheme();
   const [visible, setVisible] = useState(false);
@@ -29,6 +30,7 @@ export const Select: React.FC<SelectProps> = ({
     <View style={[styles.container, style]}>
       {label && <LabelInput text={label} style={labelStyle} isRequired={isRequired} />}
       <TouchableOpacity
+        testID={testID}
         style={[styles.selectBox, style, { borderColor: error ? theme.error : theme.border }]}
         onPress={() => setVisible(true)}
         activeOpacity={0.8}>

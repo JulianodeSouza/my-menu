@@ -4,13 +4,23 @@ import { loadMeasuredUnits } from "~/utils/cacheFunctions";
 import { IMeasuredUnit } from "~/types/measuredUnit";
 import Select from ".";
 
+type SelectMeasuredUnitsProps = {
+  value: string;
+  handleChange: (value: number) => void;
+  isRequired?: boolean;
+  error?: boolean;
+  textError?: string;
+  testID?: string;
+};
+
 export default function SelectMeasuredUnits({
   value,
   handleChange,
   isRequired,
   error,
   textError,
-}) {
+  testID,
+}: SelectMeasuredUnitsProps) {
   const [measuredUnits, setMeasuredUnits] = useState<IMeasuredUnit[]>([]);
 
   useEffect(() => {
@@ -19,6 +29,7 @@ export default function SelectMeasuredUnits({
 
   return (
     <Select
+      testID={testID}
       style={styles.inputSelect}
       label="Unidade de medida"
       options={measuredUnits.map((unit) => ({ label: unit.name, value: String(unit.id) }))}

@@ -34,6 +34,7 @@ export type ICardShop = {
   styles?: ViewStyle;
   isPressable?: boolean;
   onPress?: () => void;
+  testID?: string;
 };
 
 export type ShoppingContextType = {

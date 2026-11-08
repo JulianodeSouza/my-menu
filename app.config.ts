@@ -16,7 +16,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-router",
     "expo-font",
     "expo-web-browser",
-    "expo-splash-screen",
+    [
+      "expo-splash-screen",
+      {
+        image: "./assets/splash.png",
+        resizeMode: "contain",
+        backgroundColor: "#fafafa",
+      },
+    ],
     "expo-status-bar",
     [
       "expo-build-properties",
@@ -34,11 +41,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: "default",
   icon: "./assets/icon.png",
   userInterfaceStyle: "automatic",
-  splash: {
-    image: "./assets/splash.png",
-    resizeMode: "contain",
-    backgroundColor: "#fafafa",
-  },
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,

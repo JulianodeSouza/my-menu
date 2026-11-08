@@ -57,7 +57,7 @@ export const ShoppingProvider: React.FC<ShoppingProviderProps> = ({ children }) 
 
   const checkMarkedItems = () => {
     const hasMarkedItems = shoppingList.some((list) =>
-      list.items.some((item) => item.checked && item.amount > 0 && item.totalCaught)
+      list.items.some((item) => Boolean(item.checked))
     );
     setAnyItemMarked(hasMarkedItems);
   };

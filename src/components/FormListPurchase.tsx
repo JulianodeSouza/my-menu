@@ -220,6 +220,7 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
       <Input
         isRequired={true}
         label="Produto"
+        testID="shoplist-form-input-name"
         placeholder="Digite..."
         onChangeText={formik.handleChange("name")}
         onBlur={() => formik.setFieldTouched("name", true)}
@@ -230,6 +231,7 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
       />
 
       <SelectCategories
+        testID="shoplist-form-select-category"
         isRequired
         value={String(formik.values.category)}
         handleChange={handleCategoryChange}
@@ -248,6 +250,7 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
           <Input
             isRequired
             label="Quantidade"
+            testID="shoplist-form-input-quantity"
             placeholder="Digite..."
             onChangeText={formik.handleChange("quantity")}
             onBlur={() => formik.setFieldTouched("quantity", true)}
@@ -259,6 +262,7 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
         </View>
         <View style={{ flex: 1 }}>
           <SelectMeasuredUnits
+            testID="shoplist-form-select-unit"
             isRequired
             value={String(formik.values.measuredUnit)}
             handleChange={handleMeasuredUnitChange}
@@ -284,6 +288,7 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
           <Input
             isRequired={formMode === "edit"}
             label="Preço Unitário"
+            testID="shoplist-form-input-amount"
             placeholder="R$ 0,00"
             value={String(formik.values.amount) || ""}
             onChangeText={formik.handleChange("amount")}

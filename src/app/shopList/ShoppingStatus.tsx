@@ -15,7 +15,10 @@ export default function ShoppingStatus() {
 
   return (
     <ScreenContent style={styles.container}>
-      <View style={styles.cardsInfosContainer}>
+      <View
+        testID="shoplist-status-card"
+        accessibilityLabel="shoplist-status-card"
+        style={styles.cardsInfosContainer}>
         <CardShop>
           <View style={styles.titleCardContainer}>
             <Icon name="ShoppingCart" color={theme.primary} size={15} />

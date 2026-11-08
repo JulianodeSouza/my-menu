@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useTheme } from "~/contexts/ThemeContext";
-import { IButtonProps } from "~/types/buttons";
+import { IButtonProps } from "~/types/Buttons";
 import Icon from "../Icon";
 
 export const ButtonText = ({

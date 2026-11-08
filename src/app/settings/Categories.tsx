@@ -9,9 +9,9 @@ import { TextComponent } from "~/components/Text";
 import { useModalConfirmation } from "~/contexts/DialogContext";
 import { useTheme } from "~/contexts/ThemeContext";
 import { removeItemCache } from "~/services/cache";
+import { setInfoToast } from "~/store/reducers/geral";
 import { CategorieProps } from "~/types/categories";
 import { loadCategories } from "~/utils/cacheFunctions";
-import { setInfoToast } from "~/store/reducers/geral";
 import { borderRadius, fontWeights, spacing, typography } from "../../../theme";
 
 export default function Categories() {
@@ -48,22 +48,33 @@ export default function Categories() {
     const trimmedName = name.trim();
     if (!trimmedName) return;
 
-    if (editingCategory) {
-      await putApi(`categories/${editingCategory.id}`, { name: trimmedName });
-    } else {
-      await postApi("categories", { name: trimmedName });
-    }
+    try {
+      if (editingCategory) {
+        await putApi(`categories/${editingCategory.id}`, { name: trimmedName });
+      } else {
+        await postApi("categories", { name: trimmedName });
+      }
 
-    await removeItemCache("categories");
-    setModalVisible(false);
-    await loadData();
-    dispatch(
-      setInfoToast({
-        open: true,
-        message: editingCategory ? "Categoria atualizada com sucesso" : "Categoria adicionada com sucesso",
-        type: "success",
-      })
-    );
+      await removeItemCache("categories");
+      setModalVisible(false);
+      await loadData();
+      dispatch(
+        setInfoToast({
+          open: true,
+          message: editingCategory ? "Categoria atualizada com sucesso" : "Categoria adicionada com sucesso",
+          type: "success",
+        })
+      );
+    } catch (error: any) {
+      console.error("Erro ao salvar categoria:", error);
+      dispatch(
+        setInfoToast({
+          open: true,
+          message: error?.response?.data?.message || "Erro ao salvar categoria",
+          type: "error",
+        })
+      );
+    }
   };
 
   const removeCategory = (category: CategorieProps) => {
@@ -104,7 +115,7 @@ export default function Categories() {
             <TextComponent style={styles.title}>Categorias</TextComponent>
             <TextComponent style={styles.subtitle}>Organize seus produtos</TextComponent>
           </View>
-          <ButtonText title="Adicionar" iconStart="Plus" onPress={openCreate} />
+          <ButtonText testID="settings-category-btn-add" title="Adicionar" iconStart="Plus" onPress={openCreate} />
         </View>
         <View style={styles.listContainer}>
           <View style={{ flex: 1 }}>
@@ -134,14 +145,15 @@ export default function Categories() {
             <TextInput
               value={name}
               onChangeText={setName}
+              testID="settings-category-input-name"
               placeholder="Nome da categoria"
               placeholderTextColor={theme.textMuted}
               style={[styles.input, { color: theme.text, borderColor: theme.border }]}
               autoFocus
             />
             <View style={styles.modalActions}>
-              <ButtonText title="Cancelar" onPress={() => setModalVisible(false)} />
-              <ButtonPrimary title="Salvar" onPress={saveCategory} />
+              <ButtonText testID="settings-category-btn-cancel" title="Cancelar" onPress={() => setModalVisible(false)} />
+              <ButtonPrimary testID="settings-category-btn-save" title="Salvar" onPress={saveCategory} />
             </View>
           </View>
         </View>
@@ -162,17 +174,19 @@ function CategoryItem({
   const { theme } = useTheme();
 
   return (
-    <View style={[styles.item, { borderColor: theme.border, backgroundColor: theme.card }]}>
+    <View testID="settings-category-item" style={[styles.item, { borderColor: theme.border, backgroundColor: theme.card }]}>
       <View style={styles.itemInfo}>
         <Icon name={category.icon || "Tag"} color={theme.primary} />
         <TextComponent style={styles.itemName}>{category.name}</TextComponent>
       </View>
       <View style={styles.actions}>
-        <ButtonText title="" iconStart="Pen" iconSize={18} onPress={() => onEdit(category)} />
+        <ButtonText title="" iconStart="Pen" iconSize={18}
+          testID="settings-category-btn-edit" onPress={() => onEdit(category)} />
         <ButtonText
           title=""
           iconStart="Trash2"
           iconSize={18}
+          testID="settings-category-btn-delete"
           iconColor={theme.error}
           onPress={() => onDelete(category)}
         />

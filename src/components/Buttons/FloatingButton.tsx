@@ -1,4 +1,4 @@
-import { StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { FAB } from "react-native-paper";
 import Icon from "../Icon";
 
@@ -7,16 +7,21 @@ type FloatingButtonProps = {
   color?: string;
   onPress?: () => void;
   style?: ViewStyle;
+  testID?: string;
 };
 
-export default function FloatingButton({ icon, color, onPress, style }: FloatingButtonProps) {
+export default function FloatingButton({ icon, color, onPress, style, testID }: FloatingButtonProps) {
   return (
-    <FAB
-      icon={() => icon || <Icon name="Plus" size={24} color="white" />}
-      onPress={onPress}
-      style={[styles.fab, { backgroundColor: color || "green" }, style]}
-      color="white"
-    />
+    <View testID={testID} accessibilityLabel={testID} accessible={true}>
+      <FAB
+        testID={testID}
+        accessibilityLabel={testID}
+        icon={() => icon || <Icon name="Plus" size={24} color="white" />}
+        onPress={onPress}
+        style={[styles.fab, { backgroundColor: color || "green" }, style]}
+        color="white"
+      />
+    </View>
   );
 }
 

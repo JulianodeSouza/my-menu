@@ -53,34 +53,38 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
     setExpandedIndex(expandedIndex === 0 ? null : 0);
   };
 
-  const calculateShoppingListTotal = useCallback((list: IListPurchaseView[]) => {
-    let total = 0;
-    let havePendingInfo = false;
+  const calculateShoppingListTotal = useCallback(
+    (list: IListPurchaseView[]) => {
+      let total = 0;
+      let havePendingInfo = false;
 
-    for (const shoppingItem of list) {
-      for (const item of shoppingItem.items) {
-        if (item.checked && item.amount && (item.totalCaught || item.quantity)) {
-          total += calculateValuesByMeasuredUnits(
-            item.amount,
-            item.totalCaught || item.quantity,
-            item.unitSymbol
-          );
-        } else if (item.checked && (!item.amount || (!item.totalCaught && !item.quantity))) {
-          setSheetModalInfo({ open: true, item, mode: "edit" });
-          havePendingInfo = true;
-          break;
+      for (const shoppingItem of list) {
+        for (const item of shoppingItem.items) {
+          if (item.checked && item.amount && (item.totalCaught || item.quantity)) {
+            total += calculateValuesByMeasuredUnits(
+              item.amount,
+              item.totalCaught || item.quantity,
+              item.unitSymbol
+            );
+          } else if (item.checked && (!item.amount || (!item.totalCaught && !item.quantity))) {
+            setSheetModalInfo({ open: true, item, mode: "edit" });
+            havePendingInfo = true;
+            break;
+          }
+          if (havePendingInfo) break;
         }
-        if (havePendingInfo) break;
       }
-    }
 
-    if (havePendingInfo) return;
+      const hasMarked = list.some((group) => group.items.some((i) => Boolean(i.checked)));
+      setAnyItemMarked(hasMarked);
 
-    const progress = calculateProgress(list);
-    setProgress(progress);
-    setShoppingList(list);
-    setTotalPurchase(total);
-  }, []);
+      const progress = calculateProgress(list);
+      setProgress(progress);
+      setShoppingList(list);
+      setTotalPurchase(total);
+    },
+    [setProgress, setShoppingList, setTotalPurchase, setAnyItemMarked]
+  );
 
   const markItem = useCallback(
     (itemId: number, checked: boolean) => {
@@ -97,54 +101,88 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
   const removeItem = useCallback(
     async (idItem: number) => {
       confirmationModal.openModalConfirmation("Deseja realmente excluir este item?", async () => {
-        await deleteApi(`list-supermarket/${idItem}`);
+        try {
+          await deleteApi(`list-supermarket/${idItem}`);
 
-        dispatch(
-          setInfoToast({
-            open: true,
-            message: "Item removido com sucesso!",
-            type: "success",
-          })
-        );
+          dispatch(
+            setInfoToast({
+              open: true,
+              message: "Item removido com sucesso!",
+              type: "success",
+            })
+          );
 
-        setLoadItems(true);
+          setLoadItems(true);
+        } catch (error: any) {
+          console.error("Erro ao remover item:", error);
+          dispatch(
+            setInfoToast({
+              open: true,
+              message: error?.response?.data?.message || "Erro ao remover item",
+              type: "error",
+            })
+          );
+        }
       });
     },
-    [deleteApi, dispatch, setLoadItems]
+    [deleteApi, confirmationModal, dispatch, setLoadItems]
   );
 
   const unmarkItemPurchase = useCallback(
     async (item: IListPurchase) => {
-      const itemToSend = {
-        ...item,
-        amount: 0,
-        totalCaught: 0,
-        checked: false,
-      };
+      try {
+        const itemToSend = {
+          ...item,
+          amount: 0,
+          totalCaught: 0,
+          checked: false,
+        };
 
-      await postApi(`list-supermarket/mark-item/${item.id}`, itemToSend);
-      setLoadItems(true);
+        await postApi(`list-supermarket/mark-item/${item.id}`, itemToSend);
+        setLoadItems(true);
+      } catch (error: any) {
+        console.error("Erro ao desmarcar item:", error);
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: error?.response?.data?.message || "Erro ao desmarcar item",
+            type: "error",
+          })
+        );
+      }
     },
-    [postApi, markItem]
+    [postApi, dispatch, setLoadItems]
   );
 
   const registerItemPurchase = useCallback(
     async (purchasedItem: IListPurchase) => {
-      const itemToSend = {
-        ...purchasedItem,
-        checked: true,
-      };
+      try {
+        const itemToSend = {
+          ...purchasedItem,
+          checked: true,
+        };
 
-      await postApi(`list-supermarket/mark-item/${purchasedItem.id}`, itemToSend);
-      setLoadItems(true);
+        await postApi(`list-supermarket/mark-item/${purchasedItem.id}`, itemToSend);
+        setLoadItems(true);
+      } catch (error: any) {
+        console.error("Erro ao marcar item:", error);
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: error?.response?.data?.message || "Erro ao marcar item",
+            type: "error",
+          })
+        );
+      }
     },
-    [postApi, markItem]
+    [postApi, dispatch, setLoadItems]
   );
 
   return (
     <>
       <CardShop
         isPressable={true}
+        testID="shoplist-category-card"
         onPress={handlePress}
         styles={expandedIndex === null ? styles.spacingAccordions : undefined}>
         <View style={styles.containerAccordion}>
@@ -202,6 +240,7 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
               <View style={styles.itemInfoContainer}>
                 <RadioButton
                   color={theme.primaryDark}
+                  testID="shoplist-item-checkbox"
                   value="first"
                   status={item.checked ? "checked" : "unchecked"}
                   onPress={() => {
@@ -240,12 +279,14 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
                 <ButtonText
                   title=""
                   iconStart="Pen"
+                  testID="shoplist-item-btn-edit"
                   iconSize={15}
                   onPress={() => setSheetModalInfo({ open: true, item, mode: "edit" })}
                 />
                 <ButtonText
                   title=""
                   iconStart="Trash2"
+                  testID="shoplist-item-btn-delete"
                   iconSize={15}
                   iconColor={theme.error}
                   onPress={() => {
