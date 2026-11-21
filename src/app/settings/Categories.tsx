@@ -1,5 +1,6 @@
+import * as icons from "lucide-react-native/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Modal, StyleSheet, TextInput, View } from "react-native";
+import { Modal, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import { useDispatch } from "react-redux";
 import { useApi } from "~/ApiContext";
 import { ButtonPrimary } from "~/components/Buttons/ButtonPrimary";
@@ -14,6 +15,27 @@ import { CategorieProps } from "~/types/categories";
 import { loadCategories } from "~/utils/cacheFunctions";
 import { borderRadius, fontWeights, spacing, typography } from "../../../theme";
 
+const CATEGORY_ICONS: Array<keyof typeof icons> = [
+  "Tag",
+  "Apple",
+  "Beef",
+  "Utensils",
+  "Coffee",
+  "Milk",
+  "Cookie",
+  "Pizza",
+  "Fish",
+  "Carrot",
+  "Sparkles",
+  "Shirt",
+  "Baby",
+  "Heart",
+  "ShoppingBag",
+  "BottleWine",
+];
+
+const DEFAULT_ICON: keyof typeof icons = "Tag";
+
 export default function Categories() {
   const { theme } = useTheme();
   const dispatch = useDispatch();
@@ -22,6 +44,7 @@ export default function Categories() {
   const [categories, setCategories] = useState<CategorieProps[]>([]);
   const [editingCategory, setEditingCategory] = useState<CategorieProps | null>(null);
   const [name, setName] = useState("");
+  const [selectedIcon, setSelectedIcon] = useState<keyof typeof icons>(DEFAULT_ICON);
   const [modalVisible, setModalVisible] = useState(false);
 
   const loadData = useCallback(async () => {
@@ -35,12 +58,14 @@ export default function Categories() {
   const openCreate = () => {
     setEditingCategory(null);
     setName("");
+    setSelectedIcon(DEFAULT_ICON);
     setModalVisible(true);
   };
 
   const openEdit = (category: CategorieProps) => {
     setEditingCategory(category);
     setName(category.name);
+    setSelectedIcon(category.icon || DEFAULT_ICON);
     setModalVisible(true);
   };
 
@@ -49,10 +74,11 @@ export default function Categories() {
     if (!trimmedName) return;
 
     try {
+      const payload = { name: trimmedName, icon: selectedIcon };
       if (editingCategory) {
-        await putApi(`categories/${editingCategory.id}`, { name: trimmedName });
+        await putApi(`categories/${editingCategory.id}`, payload);
       } else {
-        await postApi("categories", { name: trimmedName });
+        await postApi("categories", payload);
       }
 
       await removeItemCache("categories");
@@ -151,6 +177,36 @@ export default function Categories() {
               style={[styles.input, { color: theme.text, borderColor: theme.border }]}
               autoFocus
             />
+            <View style={styles.iconSelectorSection}>
+              <TextComponent style={styles.label}>Ícone</TextComponent>
+              <View testID="settings-category-icon-selector" style={styles.iconSelector}>
+                {CATEGORY_ICONS.map((iconName) => {
+                  const isSelected = selectedIcon === iconName;
+                  return (
+                    <TouchableOpacity
+                      key={iconName}
+                      testID={`settings-category-icon-option-${iconName.toLowerCase()}`}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Ícone ${iconName}`}
+                      accessibilityState={{ selected: isSelected }}
+                      onPress={() => setSelectedIcon(iconName)}
+                      style={[
+                        styles.iconOption,
+                        {
+                          borderColor: isSelected ? theme.primary : theme.border,
+                          backgroundColor: isSelected ? theme.primaryOpacity10 : "transparent",
+                        },
+                      ]}>
+                      <Icon
+                        name={iconName}
+                        color={isSelected ? theme.primary : theme.textMuted}
+                        size={20}
+                      />
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
             <View style={styles.modalActions}>
               <ButtonText testID="settings-category-btn-cancel" title="Cancelar" onPress={() => setModalVisible(false)} />
               <ButtonPrimary testID="settings-category-btn-save" title="Salvar" onPress={saveCategory} />
@@ -228,6 +284,26 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     padding: spacing.base,
     fontSize: typography.fontSizeBase,
+  },
+  iconSelectorSection: {
+    gap: spacing.xs,
+  },
+  label: {
+    fontSize: typography.fontSizeSm,
+    fontWeight: fontWeights.medium,
+  },
+  iconSelector: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+  },
+  iconOption: {
+    width: 44,
+    height: 44,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
   },
   modalActions: { flexDirection: "row", justifyContent: "flex-end", gap: spacing.sm },
 });

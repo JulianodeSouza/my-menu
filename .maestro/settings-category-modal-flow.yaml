@@ -1,0 +1,90 @@
+appId: com.mymenu
+---
+# ========================================================
+# Fluxo E2E: Validação Detalhada do Seletor de Ícones de Categorias
+# Critérios de Aceite: CA02, CA03, CA04, CA05
+# ========================================================
+
+- launchApp:
+    clearState: false
+
+# Garante que está na tela de configurações
+- assertVisible:
+    id: "settings-screen"
+
+# --------------------------------------------------------
+# CA05: Alternar temas (Claro / Escuro)
+# --------------------------------------------------------
+- assertVisible:
+    id: "settings-theme-option-dark"
+- tapOn:
+    id: "settings-theme-option-dark"
+
+- assertVisible:
+    id: "settings-theme-option-light"
+- tapOn:
+    id: "settings-theme-option-light"
+
+# --------------------------------------------------------
+# CA02: Abrir modal de criação e validar estado inicial dos ícones
+# --------------------------------------------------------
+- assertVisible:
+    id: "settings-category-btn-add"
+- tapOn:
+    id: "settings-category-btn-add"
+
+- assertVisible:
+    id: "settings-category-input-name"
+- assertVisible:
+    id: "settings-category-icon-selector"
+
+# Verifica se os ícones da grade estão visíveis
+- assertVisible:
+    id: "settings-category-icon-option-tag"
+- assertVisible:
+    id: "settings-category-icon-option-apple"
+- assertVisible:
+    id: "settings-category-icon-option-cookie"
+- assertVisible:
+    id: "settings-category-icon-option-bottlewine"
+
+# --------------------------------------------------------
+# CA03: Selecionar ícone customizado e salvar nova categoria
+# --------------------------------------------------------
+- tapOn:
+    id: "settings-category-input-name"
+- inputText: "Doces Teste"
+
+# Seleciona o ícone Cookie
+- tapOn:
+    id: "settings-category-icon-option-cookie"
+
+- tapOn:
+    id: "settings-category-btn-save"
+
+# Confirma que modal fechou e a categoria aparece listada
+- assertNotVisible:
+    id: "settings-category-input-name"
+- assertVisible: "Doces Teste"
+
+# --------------------------------------------------------
+# CA04: Editar categoria existente e validar ícone carregado
+# --------------------------------------------------------
+- tapOn:
+    id: "settings-category-btn-edit"
+    index: 0
+
+- assertVisible:
+    id: "settings-category-input-name"
+- assertVisible:
+    id: "settings-category-icon-selector"
+
+# Altera o ícone para Apple
+- tapOn:
+    id: "settings-category-icon-option-apple"
+
+- tapOn:
+    id: "settings-category-btn-save"
+
+- assertNotVisible:
+    id: "settings-category-input-name"

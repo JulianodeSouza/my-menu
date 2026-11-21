@@ -1,40 +1,119 @@
 appId: com.mymenu
 ---
-# Fluxo E2E: Gestão de Categorias nas Configurações
+# ========================================================
+# Fluxo E2E: Gestão de Categorias e Seleção de Ícones (Settings)
+# Critérios de Aceite: CA01, CA02, CA03, CA04, CA05
+# ========================================================
+
 - launchApp:
     clearState: false
 
-# 1. Navega para a tela de configurações a partir do cabeçalho
+# Se já estiver na tela de configurações, volta para a home para validar CA01
+- runFlow:
+    when:
+      visible:
+        id: "settings-screen"
+    commands:
+      - back
+
+# --------------------------------------------------------
+# CA01: Acesso a Configurações a partir da Home
+# --------------------------------------------------------
 - assertVisible:
     id: "header-btn-settings"
 - tapOn:
     id: "header-btn-settings"
-
-# 2. Confirma que está na tela de configurações
 - assertVisible:
     id: "settings-screen"
+- takeScreenshot: "docs/qa-reports/images/ca01-settings-screen"
 
-# 3. Toca em Adicionar Categoria
+# --------------------------------------------------------
+# CA05: Alternar temas (Claro / Escuro)
+# --------------------------------------------------------
+- assertVisible:
+    id: "settings-theme-option-dark"
+- tapOn:
+    id: "settings-theme-option-dark"
+- takeScreenshot: "docs/qa-reports/images/ca05-theme-dark"
+
+- assertVisible:
+    id: "settings-theme-option-light"
+- tapOn:
+    id: "settings-theme-option-light"
+- takeScreenshot: "docs/qa-reports/images/ca05-theme-light"
+
+# --------------------------------------------------------
+# CA02: Abrir modal de criação e validar estado inicial dos ícones
+# --------------------------------------------------------
 - assertVisible:
     id: "settings-category-btn-add"
 - tapOn:
     id: "settings-category-btn-add"
 
-# 4. Digita o nome da categoria no modal
 - assertVisible:
     id: "settings-category-input-name"
+- assertVisible:
+    id: "settings-category-icon-selector"
+
+# Verifica se os ícones principais estão presentes na grade
+- assertVisible:
+    id: "settings-category-icon-option-tag"
+- assertVisible:
+    id: "settings-category-icon-option-apple"
+- assertVisible:
+    id: "settings-category-icon-option-cookie"
+- assertVisible:
+    id: "settings-category-icon-option-bottlewine"
+
+- takeScreenshot: "docs/qa-reports/images/ca02-icon-selector-modal"
+
+# --------------------------------------------------------
+# CA03: Selecionar ícone customizado e salvar nova categoria
+# --------------------------------------------------------
 - tapOn:
     id: "settings-category-input-name"
-- inputText: "Laticínios"
+- inputText: "Doces QA"
 
-# 5. Salva a nova categoria
+# Seleciona o ícone Cookie
+- tapOn:
+    id: "settings-category-icon-option-cookie"
+- takeScreenshot: "docs/qa-reports/images/ca03-icon-cookie-selected"
+
 - tapOn:
     id: "settings-category-btn-save"
 
-# 6. Confirma que o modal foi fechado e a categoria aparece na tela
+# Confirma que modal fechou e a categoria aparece listada
 - assertNotVisible:
     id: "settings-category-input-name"
-- assertVisible: "Laticínios"
+- assertVisible: "Doces QA"
+- takeScreenshot: "docs/qa-reports/images/ca03-category-created"
 
-# 7. Screenshot de evidência
-- takeScreenshot: "evidencia-categoria-adicionada"
+# --------------------------------------------------------
+# CA04: Editar categoria existente e validar ícone carregado
+# --------------------------------------------------------
+- tapOn:
+    id: "settings-category-btn-edit"
+    index: 0
+
+- assertVisible:
+    id: "settings-category-input-name"
+- assertVisible:
+    id: "settings-category-icon-selector"
+- takeScreenshot: "docs/qa-reports/images/ca04-edit-modal-loaded"
+
+# Altera o ícone para Apple
+- tapOn:
+    id: "settings-category-icon-option-apple"
+- takeScreenshot: "docs/qa-reports/images/ca04-edit-icon-apple-selected"
+
+- tapOn:
+    id: "settings-category-btn-save"
+
+- assertNotVisible:
+    id: "settings-category-input-name"
+- takeScreenshot: "docs/qa-reports/images/ca04-category-updated"
+
+# Volta para a home para deixar o app em estado limpo
+- back
+- assertVisible:
+    id: "header-btn-settings"

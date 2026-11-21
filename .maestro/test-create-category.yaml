@@ -1,0 +1,25 @@
+appId: com.mymenu
+---
+- assertVisible:
+    id: "settings-category-btn-add"
+- tapOn:
+    id: "settings-category-btn-add"
+
+- assertVisible:
+    id: "settings-category-icon-selector"
+
+- takeScreenshot: "docs/qa-reports/images/modal-create-open"
+
+- tapOn:
+    id: "settings-category-input-name"
+- inputText: "Congelados QA"
+
+- tapOn:
+    id: "settings-category-icon-option-pizza"
+
+- takeScreenshot: "docs/qa-reports/images/modal-pizza-selected"
+
+- tapOn:
+    id: "settings-category-btn-save"
+
+- takeScreenshot: "docs/qa-reports/images/after-save-category"
