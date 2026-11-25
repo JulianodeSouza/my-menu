@@ -1,6 +1,6 @@
 import * as icons from "lucide-react-native/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Modal, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, Modal, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import { useDispatch } from "react-redux";
 import { useApi } from "~/ApiContext";
 import { ButtonPrimary } from "~/components/Buttons/ButtonPrimary";
@@ -161,9 +161,10 @@ export default function Categories() {
       <Modal
         visible={modalVisible}
         transparent
+        statusBarTranslucent
         animationType="fade"
         onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView behavior="padding" style={styles.modalOverlay}>
           <View style={[styles.modal, { backgroundColor: theme.background }]}>
             <TextComponent style={styles.modalTitle}>
               {editingCategory ? "Editar categoria" : "Adicionar categoria"}
@@ -212,7 +213,7 @@ export default function Categories() {
               <ButtonPrimary testID="settings-category-btn-save" title="Salvar" onPress={saveCategory} />
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );

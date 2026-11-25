@@ -3,7 +3,11 @@ import { useDispatch } from "react-redux";
 import { useApi } from "~/ApiContext";
 import { setInfoToast } from "~/store/reducers/geral";
 import { IListPurchaseView, ShoppingContextType, ShoppingProviderProps } from "~/types/shopList";
-import { getLengthTotalOfList, getTotalMarkedItems } from "~/utils/sumUtils";
+import {
+  calculateValuesByMeasuredUnits,
+  getLengthTotalOfList,
+  getTotalMarkedItems,
+} from "~/utils/sumUtils";
 import { useModalConfirmation } from "./DialogContext";
 
 const ShoppingContext = createContext<ShoppingContextType | undefined>(undefined);
@@ -43,7 +47,19 @@ export const ShoppingProvider: React.FC<ShoppingProviderProps> = ({ children }) 
       const totalItems = getLengthTotalOfList(shoppingList);
       const markedItems = getTotalMarkedItems(shoppingList);
       const totalCost = shoppingList.reduce(
-        (sum, list) => sum + list.items.reduce((subSum, item) => subSum + (item.amount || 0), 0),
+        (sum, list) =>
+          sum +
+          list.items.reduce((subSum, item) => {
+            if (!item.checked) return subSum;
+            return (
+              subSum +
+              calculateValuesByMeasuredUnits(
+                Number(item.amount) || 0,
+                Number(item.totalCaught || item.quantity) || 0,
+                item.unitSymbol
+              )
+            );
+          }, 0),
         0
       );
 

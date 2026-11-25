@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Modal, StyleSheet, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Modal, StyleSheet, TextInput, View } from "react-native";
 import { useDispatch } from "react-redux";
 import { useApi } from "~/ApiContext";
 import { ButtonPrimary } from "~/components/Buttons/ButtonPrimary";
@@ -145,9 +145,10 @@ export default function MeasuredUnits() {
       <Modal
         visible={modalVisible}
         transparent
+        statusBarTranslucent
         animationType="fade"
         onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView behavior="padding" style={styles.modalOverlay}>
           <View style={[styles.modal, { backgroundColor: theme.background }]}>
             <TextComponent style={styles.modalTitle}>
               {editingUnit ? "Editar unidade" : "Adicionar unidade"}
@@ -172,7 +173,7 @@ export default function MeasuredUnits() {
               <ButtonPrimary title="Salvar" onPress={saveUnit} />
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );

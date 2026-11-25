@@ -13,7 +13,6 @@ import { useTheme } from "~/contexts/ThemeContext";
 import { setInfoToast } from "~/store/reducers/geral";
 import { IListPurchase, IListPurchaseView } from "~/types/shopList";
 import { formatNumberToMonetary } from "~/utils/stringUtils";
-import { calculateProgress, calculateValuesByMeasuredUnits } from "~/utils/sumUtils";
 import { borderRadius, fontWeights, spacing, typography } from "../../../theme";
 import DialogItem from "./DialogItem";
 
@@ -26,16 +25,9 @@ type EditionModalProps = {
 };
 export default function CardItemsList({ items, category, categoryIcon, index }: IListPurchaseView) {
   const dispatch = useDispatch();
-  const {
-    shoppingList,
-    setProgress,
-    setAnyItemMarked,
-    setShoppingList,
-    setTotalPurchase,
-    setLoadItems,
-  } = useShoppingContext();
+  const { setLoadItems } = useShoppingContext();
   const confirmationModal = useModalConfirmation();
-  const { deleteApi, postApi } = useApi();
+  const { deleteApi, postApi, putApi } = useApi();
   const { theme } = useTheme();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const checkedCount = items.filter((item) => item.checked).length;
@@ -52,51 +44,6 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
     );
     setExpandedIndex(expandedIndex === 0 ? null : 0);
   };
-
-  const calculateShoppingListTotal = useCallback(
-    (list: IListPurchaseView[]) => {
-      let total = 0;
-      let havePendingInfo = false;
-
-      for (const shoppingItem of list) {
-        for (const item of shoppingItem.items) {
-          if (item.checked && item.amount && (item.totalCaught || item.quantity)) {
-            total += calculateValuesByMeasuredUnits(
-              item.amount,
-              item.totalCaught || item.quantity,
-              item.unitSymbol
-            );
-          } else if (item.checked && (!item.amount || (!item.totalCaught && !item.quantity))) {
-            setSheetModalInfo({ open: true, item, mode: "edit" });
-            havePendingInfo = true;
-            break;
-          }
-          if (havePendingInfo) break;
-        }
-      }
-
-      const hasMarked = list.some((group) => group.items.some((i) => Boolean(i.checked)));
-      setAnyItemMarked(hasMarked);
-
-      const progress = calculateProgress(list);
-      setProgress(progress);
-      setShoppingList(list);
-      setTotalPurchase(total);
-    },
-    [setProgress, setShoppingList, setTotalPurchase, setAnyItemMarked]
-  );
-
-  const markItem = useCallback(
-    (itemId: number, checked: boolean) => {
-      const updatedList = shoppingList.map((category) => ({
-        ...category,
-        items: category.items.map((item) => (item.id === itemId ? { ...item, checked } : item)),
-      }));
-
-      calculateShoppingListTotal(updatedList);
-    },
-    [shoppingList, calculateShoppingListTotal]
-  );
 
   const removeItem = useCallback(
     async (idItem: number) => {
@@ -155,7 +102,7 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
   );
 
   const registerItemPurchase = useCallback(
-    async (purchasedItem: IListPurchase) => {
+    async (purchasedItem: IListPurchase): Promise<boolean> => {
       try {
         const itemToSend = {
           ...purchasedItem,
@@ -164,6 +111,7 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
 
         await postApi(`list-supermarket/mark-item/${purchasedItem.id}`, itemToSend);
         setLoadItems(true);
+        return true;
       } catch (error: any) {
         console.error("Erro ao marcar item:", error);
         dispatch(
@@ -173,9 +121,58 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
             type: "error",
           })
         );
+        return false;
       }
     },
     [postApi, dispatch, setLoadItems]
+  );
+
+  const editItemPurchase = useCallback(
+    async (editedItem: IListPurchase): Promise<boolean> => {
+      try {
+        const itemToSend = {
+          ...editedItem,
+          checked: Boolean(sheetModalInfo.item?.checked),
+        };
+
+        await putApi(`list-supermarket/${editedItem.id}`, itemToSend);
+        setLoadItems(true);
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: "Item atualizado com sucesso!",
+            type: "success",
+          })
+        );
+        return true;
+      } catch (error: any) {
+        console.error("Erro ao editar item:", error);
+        dispatch(
+          setInfoToast({
+            open: true,
+            message: error?.response?.data?.message || "Erro ao editar item",
+            type: "error",
+          })
+        );
+        return false;
+      }
+    },
+    [putApi, dispatch, setLoadItems, sheetModalInfo.item?.checked]
+  );
+
+  const markItem = useCallback(
+    (item: IListPurchase) => {
+      const hasValidAmount = Number(item.amount) > 0;
+      const hasValidTotalCaught = Number(item.totalCaught) > 0;
+
+      if (!hasValidAmount || !hasValidTotalCaught) {
+        setSheetModalInfo({ open: true, item, mode: "edit" });
+        return;
+      }
+
+      registerItemPurchase(item);
+    },
+    [registerItemPurchase]
   );
 
   return (
@@ -247,7 +244,7 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
                     if (item.checked) {
                       unmarkItemPurchase(item);
                     } else {
-                      markItem(item.id, !item.checked);
+                      markItem(item);
                     }
                   }}
                 />
@@ -301,17 +298,18 @@ export default function CardItemsList({ items, category, categoryIcon, index }: 
 
       {sheetModalInfo.open && (
         <DialogItem
-          {...{
-            mode: "edit",
-            title: "Editar Item",
-            isEdit: sheetModalInfo.mode === "edit",
-            infoDialog: sheetModalInfo,
-            onClose() {
-              setSheetModalInfo({ open: false });
-            },
-            handleActionForm(values) {
-              registerItemPurchase(values);
-            },
+          mode="edit"
+          title="Editar Item"
+          isEdit={sheetModalInfo.mode === "edit"}
+          infoDialog={sheetModalInfo}
+          onClose={() => {
+            setSheetModalInfo({ open: false });
+          }}
+          handleActionForm={(values, actionMode) => {
+            if (actionMode === "mark") {
+              return registerItemPurchase(values);
+            }
+            return editItemPurchase(values);
           }}
         />
       )}

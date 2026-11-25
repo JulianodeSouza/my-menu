@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
+import { useSheetModalScroll } from "~/components/SheetModal";
 import { useTheme } from "~/contexts/ThemeContext";
 import { InputProps } from "~/types/input";
 import { onlyNumbers } from "~/utils/stringUtils";
@@ -15,9 +16,11 @@ export const Input = ({
   labelStyle,
   isRequired,
   mask,
+  onFocus,
   ...rest
 }: InputProps) => {
   const { theme } = useTheme();
+  const sheetModalScroll = useSheetModalScroll();
   const [maskedValue, setMaskedValue] = useState(rest.value ?? "");
 
   const getRawValue = (masked: string) => {
@@ -33,6 +36,11 @@ export const Input = ({
     const masked = mask ? mask(rawValue) : rawValue;
     setMaskedValue(masked);
     if (rest.onChangeText) rest.onChangeText(rawValue);
+  };
+
+  const handleFocus: NonNullable<InputProps["onFocus"]> = (event) => {
+    sheetModalScroll?.scrollToFocusedInput();
+    onFocus?.(event);
   };
 
   useEffect(() => {
@@ -57,6 +65,7 @@ export const Input = ({
           {...rest}
           value={maskedValue}
           onChangeText={handleChangeText}
+          onFocus={handleFocus}
           placeholderTextColor={`${theme.text}`}
         />
         {error && (
