@@ -18,7 +18,7 @@ type DialogItemProps = {
   handleActionForm: (
     values: IListPurchase,
     mode: "edit" | "mark" | "register"
-  ) => void | Promise<void>;
+  ) => boolean | void | Promise<boolean | void>;
   isEdit?: boolean;
   title: string;
   mode: "edit" | "register";
@@ -33,14 +33,15 @@ export default function DialogItem({
   handleActionForm,
 }: DialogItemProps) {
   const formRef = useRef<FormListPurchaseRef>(null);
+  const actionModeRef = useRef<"edit" | "mark" | "register">(mode);
   const dispatch = useDispatch();
 
   const handleAction = useCallback(
     async (values: IListPurchase) => {
-      if (!values) return;
-      await handleActionForm(values, mode);
+      if (!values) return false;
+      return await handleActionForm(values, actionModeRef.current);
     },
-    [mode, handleActionForm]
+    [handleActionForm]
   );
 
   const handleClose = useCallback(() => {
@@ -48,6 +49,7 @@ export default function DialogItem({
   }, [onClose]);
 
   const handleSecondaryAction = useCallback(async () => {
+    actionModeRef.current = mode;
     dispatch(setInfoToast({ position: "top" }));
     const saved = await formRef.current?.submit();
 
@@ -57,13 +59,14 @@ export default function DialogItem({
   }, [dispatch, mode]);
 
   const handlePrimaryAction = useCallback(async () => {
+    actionModeRef.current = mode === "edit" ? "mark" : "register";
     dispatch(setInfoToast({ position: "bottom" }));
     const saved = await formRef.current?.submit();
 
     if (saved) {
       onClose();
     }
-  }, [onClose]);
+  }, [dispatch, mode, onClose]);
 
   const getButtonTexts = useCallback(() => {
     if (mode === "register") {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Keyboard, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "~/contexts/ThemeContext";
 import { SelectProps } from "~/types/select";
 import { borderRadius, spacing, typography } from "../../../theme";
@@ -32,7 +32,10 @@ export const Select: React.FC<SelectProps> = ({
       <TouchableOpacity
         testID={testID}
         style={[styles.selectBox, style, { borderColor: error ? theme.error : theme.border }]}
-        onPress={() => setVisible(true)}
+        onPress={() => {
+          Keyboard.dismiss();
+          setVisible(true);
+        }}
         activeOpacity={0.8}>
         <Text style={[styles.selectedText, { color: theme.text }]}>
           {selected ? selected.label : "Selecione..."}

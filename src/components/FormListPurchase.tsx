@@ -1,5 +1,13 @@
 import { useFormik } from "formik";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Keyboard, StyleSheet, View } from "react-native";
 import * as yup from "yup";
 import { Input } from "~/components/Input";
@@ -25,100 +33,113 @@ export interface FormListPurchaseRef {
   reset: () => void;
 }
 
+type FormInternalValues = Omit<FormValuesProps, "quantity" | "totalCaught" | "amount"> & {
+  quantity: number | string;
+  totalCaught?: number | string;
+  amount?: number | string;
+};
+
 export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurchase(
   { save, isEdit, item, formMode }: PropsForm,
   ref
 ) {
-  const [previewTotalPurchase, setPreviewTotalPurchase] = useState(0);
+  const [measuredUnits, setMeasuredUnits] = useState<IMeasuredUnit[]>([]);
+  const submitSuccessRef = useRef(false);
   const { theme } = useTheme();
 
-  const initialState: FormValuesProps = {
+  const initialState: FormInternalValues = {
     name: "",
     category: 0,
     quantity: 0,
     measuredUnit: 0,
     totalCaught: 0,
-    amount: 0,
+    amount: "",
   };
 
-  const Schema = useMemo(
-    () =>
-      yup.object().shape(
-        {
-          name: yup
-            .string()
-            .typeError("Informe o produto")
-            .required("Informe o produto")
-            .min(1, "Informe o produto"),
-          category: yup
-            .number()
-            .typeError("Selecione uma categoria")
-            .required("Selecione uma categoria")
-            .positive("Selecione uma categoria válida"),
-          quantity: yup
-            .number()
-            .transform((value, originalValue) =>
-              typeof originalValue === "string"
-                ? Number(originalValue.replace(",", "."))
-                : value
-            )
-            .typeError("Informe a quantidade")
-            .required("Informe a quantidade")
-            .positive("A quantidade deve ser maior que zero"),
-          measuredUnit: yup
-            .number()
-            .typeError("Selecione a unidade de medida")
-            .required("Selecione a unidade de medida")
-            .positive("Selecione uma unidade de medida válida"),
-          amount: yup.number().when("$formMode", {
-            is: "edit",
-            then: () =>
-              yup
-                .number()
-                .typeError("Informe o preço do produto")
-                .required("Informe o preço do produto")
-                .min(0.01, "O preço deve ser maior que zero"),
-            otherwise: () => yup.number(),
-          }),
-          totalCaught: yup.number().when("$formMode", {
-            is: "edit",
-            then: () =>
-              yup
-                .number()
-                .transform((value, originalValue) =>
-                  typeof originalValue === "string"
-                    ? Number(originalValue.replace(",", "."))
-                    : value
-                )
-                .typeError("Informe a quantidade pega")
-                .required("Informe a quantidade pega")
-                .min(0.01, "A quantidade pega deve ser maior que zero"),
-            otherwise: () => yup.number(),
-          }),
-        },
-        [["$formMode", formMode]]
-      ),
-    [formMode]
-  );
+  const Schema = useMemo(() => {
+    const isEditMode = formMode === "edit";
 
-  const formik = useFormik({
+    return yup.object().shape({
+      name: yup
+        .string()
+        .typeError("Informe o produto")
+        .required("Informe o produto")
+        .min(1, "Informe o produto"),
+      category: yup
+        .number()
+        .typeError("Selecione uma categoria")
+        .required("Selecione uma categoria")
+        .positive("Selecione uma categoria válida"),
+      quantity: yup
+        .number()
+        .transform((value, originalValue) => {
+          if (originalValue === "" || originalValue === null || originalValue === undefined) {
+            return undefined;
+          }
+          return typeof originalValue === "string"
+            ? Number(originalValue.replace(",", "."))
+            : value;
+        })
+        .typeError("Informe a quantidade")
+        .required("Informe a quantidade")
+        .positive("A quantidade deve ser maior que zero"),
+      measuredUnit: yup
+        .number()
+        .typeError("Selecione a unidade de medida")
+        .required("Selecione a unidade de medida")
+        .positive("Selecione uma unidade de medida válida"),
+      amount: isEditMode
+        ? yup
+          .number()
+          .transform((_value, originalValue) => {
+            if (originalValue === "" || originalValue === null || originalValue === undefined) {
+              return undefined;
+            }
+            const digits = onlyNumbers(String(originalValue));
+            if (!digits) return undefined;
+            return parseInt(digits, 10) / 100;
+          })
+          .typeError("Informe o preço do produto")
+          .required("Informe o preço do produto")
+          .min(0.01, "O preço deve ser maior que zero")
+        : yup.mixed().notRequired(),
+      totalCaught: isEditMode
+        ? yup
+          .number()
+          .transform((value, originalValue) => {
+            if (originalValue === "" || originalValue === null || originalValue === undefined) {
+              return undefined;
+            }
+            return typeof originalValue === "string"
+              ? Number(originalValue.replace(",", "."))
+              : value;
+          })
+          .typeError("Informe a quantidade pega")
+          .required("Informe a quantidade pega")
+          .min(0.01, "A quantidade pega deve ser maior que zero")
+        : yup.mixed().notRequired(),
+    });
+  }, [formMode]);
+
+  const formik = useFormik<FormInternalValues>({
     initialValues: initialState,
     validationSchema: Schema,
     validateOnChange: true,
     validateOnBlur: true,
     onSubmit: async (values) => {
       // Remove mask from amount and convert to number
-      const amountValue = onlyNumbers(String(values.amount));
+      const amountValue = onlyNumbers(String(values.amount ?? ""));
       const amountNumber = amountValue ? parseInt(amountValue, 10) / 100 : 0;
 
       const valuesFormatted: FormValuesProps = {
         ...values,
         quantity: formatDecimal(values.quantity) || 0,
-        totalCaught: formatDecimal(values.totalCaught) || 0,
+        totalCaught: formatDecimal(values.totalCaught ?? 0) || 0,
         amount: amountNumber,
       };
 
-      await save(valuesFormatted);
+      const result = await save(valuesFormatted);
+      submitSuccessRef.current = result !== false;
     },
   });
 
@@ -126,20 +147,28 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
     ref,
     () => ({
       submit: async () => {
-        await formik.setTouched({
-          name: true,
-          category: true,
-          quantity: true,
-          measuredUnit: true,
-          amount: true,
-          totalCaught: true,
-        });
+        submitSuccessRef.current = false;
+        await formik.setTouched(
+          {
+            name: true,
+            category: true,
+            quantity: true,
+            measuredUnit: true,
+            amount: true,
+            totalCaught: true,
+          },
+          false
+        );
         const errors = await formik.validateForm();
 
         // Se não houver erros, faz o submit
         if (Object.keys(errors).length === 0) {
-          await formik.submitForm();
-          return true;
+          try {
+            await formik.submitForm();
+            return submitSuccessRef.current;
+          } catch {
+            return false;
+          }
         }
 
         return false;
@@ -150,14 +179,34 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
   );
 
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchUnits = async () => {
+      const units = await loadMeasuredUnits();
+      if (isMounted) {
+        setMeasuredUnits(units);
+      }
+    };
+
+    fetchUnits();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
     if (isEdit && item) {
-      const valuesForm: FormValuesProps = {
+      const numericAmount = Number(item.amount) || 0;
+      const amountInCents = numericAmount > 0 ? String(Math.round(numericAmount * 100)) : "";
+
+      const valuesForm: FormInternalValues = {
         id: item.id,
         name: item.name,
         category: item.category,
         quantity: item.quantity || 0,
         measuredUnit: item.measuredUnit,
-        amount: item.amount,
+        amount: amountInCents,
         totalCaught: item.totalCaught || 0,
       };
 
@@ -181,6 +230,10 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
     [formik]
   );
 
+  const handleMonetaryMask = useCallback((value: string) => {
+    return maskInputMonetary(value);
+  }, []);
+
   useEffect(() => {
     const keyboardWillHide = Keyboard.addListener("keyboardWillHide", () => {
       Keyboard.dismiss();
@@ -191,28 +244,29 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
     };
   }, []);
 
-  useEffect(() => {
-    const calculatePreviewTotal = async () => {
-      const quantity = formatDecimal(formik.values.totalCaught || formik.values.quantity);
-      const amountValue = onlyNumbers(String(formik.values.amount));
-      const amountNumber = amountValue ? parseInt(amountValue, 10) / 100 : 0;
-      const measuredUnitCache: IMeasuredUnit[] = await loadMeasuredUnits();
+  const previewTotalPurchase = useMemo(() => {
+    const quantity =
+      formMode === "edit"
+        ? formatDecimal(formik.values.totalCaught ?? 0)
+        : formatDecimal(formik.values.quantity);
 
-      const measuredUnit: IMeasuredUnit = measuredUnitCache?.find(
-        (unit) => unit.id === formik.values.measuredUnit
-      );
+    const amountValue = onlyNumbers(String(formik.values.amount ?? ""));
+    const amountNumber = amountValue ? parseInt(amountValue, 10) / 100 : 0;
 
-      const total = calculateValuesByMeasuredUnits(amountNumber, quantity, measuredUnit?.unitSymbol);
+    const measuredUnit = measuredUnits.find(
+      (unit) => Number(unit.id) === Number(formik.values.measuredUnit)
+    );
+    const unitSymbol = measuredUnit?.unitSymbol ?? item?.unitSymbol;
 
-      setPreviewTotalPurchase(total);
-    };
-
-    calculatePreviewTotal();
+    return calculateValuesByMeasuredUnits(amountNumber, quantity, unitSymbol);
   }, [
+    formMode,
     formik.values.quantity,
     formik.values.totalCaught,
     formik.values.amount,
     formik.values.measuredUnit,
+    measuredUnits,
+    item?.unitSymbol,
   ]);
 
   return (
@@ -275,9 +329,15 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
       {formMode === "edit" && (
         <>
           <Input
+            isRequired={formMode === "edit"}
             label="Quantidade pega"
+            testID="shoplist-form-input-total-caught"
             placeholder="Digite..."
-            value={String(formik.values.totalCaught) || ""}
+            value={
+              formik.values.totalCaught !== undefined && formik.values.totalCaught !== null
+                ? String(formik.values.totalCaught)
+                : ""
+            }
             onChangeText={formik.handleChange("totalCaught")}
             onBlur={() => formik.setFieldTouched("totalCaught", true)}
             keyboardType="numeric"
@@ -290,15 +350,17 @@ export default forwardRef<FormListPurchaseRef, PropsForm>(function FormListPurch
             label="Preço Unitário"
             testID="shoplist-form-input-amount"
             placeholder="R$ 0,00"
-            value={String(formik.values.amount) || ""}
+            value={
+              formik.values.amount !== undefined && formik.values.amount !== null
+                ? String(formik.values.amount)
+                : ""
+            }
             onChangeText={formik.handleChange("amount")}
             onBlur={() => formik.setFieldTouched("amount", true)}
             keyboardType="numeric"
             error={formik.touched.amount && Boolean(formik.errors.amount)}
             textError={formik.errors.amount}
-            mask={(value: string) => {
-              return maskInputMonetary(Number(value));
-            }}
+            mask={handleMonetaryMask}
           />
 
           <View style={[styles.containerTotal, { backgroundColor: theme.primaryOpacity10 }]}>
@@ -335,7 +397,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
-    marginTop: spacing.base,
+    marginBottom: spacing.base,
   },
   textTotal: {
     padding: 10,

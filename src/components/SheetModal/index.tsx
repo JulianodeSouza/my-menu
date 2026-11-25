@@ -1,21 +1,35 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   Animated,
-  Dimensions,
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   PanResponder,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
+  TextInput,
   View,
   useWindowDimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "~/components/Icon";
 import { TextComponent } from "~/components/Text";
 import { useTheme } from "~/contexts/ThemeContext";
 import { borderRadius, fontWeights, shadows, spacing, typography } from "../../../theme";
 
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+type SheetModalContextValue = {
+  scrollToFocusedInput: () => void;
+};
+
+const SheetModalContext = createContext<SheetModalContextValue | null>(null);
+
+export function useSheetModalScroll() {
+  return useContext(SheetModalContext);
+}
 
 type Side = "top" | "right" | "bottom" | "left";
 
@@ -41,34 +55,127 @@ export function SheetModal({
   showCloseButton = true,
 }: SheetModalProps) {
   const { theme } = useTheme();
-  const { height: windowHeight } = useWindowDimensions();
-  const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const translateValue = useRef(new Animated.Value(windowHeight)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const scrollViewRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
+  const scrollOffsetRef = useRef(0);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   const isVertical = side === "top" || side === "bottom";
-  const animatedValue = translateY;
+  const animatedValue = translateValue;
 
   const getInitialValue = useCallback(() => {
     switch (side) {
       case "bottom":
-        return SCREEN_HEIGHT;
+        return windowHeight;
       case "top":
-        return -SCREEN_HEIGHT;
+        return -windowHeight;
       case "right":
-        return SCREEN_HEIGHT;
+        return windowWidth;
       case "left":
-        return -SCREEN_HEIGHT;
+        return -windowWidth;
       default:
-        return SCREEN_HEIGHT;
+        return windowHeight;
     }
-  }, [side]);
+  }, [side, windowHeight, windowWidth]);
+
+  const scrollToFocusedInput = useCallback(() => {
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    scrollTimeoutRef.current = setTimeout(() => {
+      const currentlyFocusedInput = TextInput.State.currentlyFocusedInput?.() as
+        | {
+            measureInWindow?: (
+              callback: (x: number, y: number, width: number, height: number) => void
+            ) => void;
+          }
+        | null
+        | undefined;
+
+      if (!currentlyFocusedInput?.measureInWindow || !scrollViewRef.current) return;
+
+      currentlyFocusedInput.measureInWindow((_x, inputY, _width, inputHeight) => {
+        scrollViewRef.current?.measureInWindow((_sx, scrollY, _sw, scrollHeight) => {
+          if (!scrollHeight) return;
+
+          const visibleBottom = scrollY + scrollHeight;
+          const inputBottom = inputY + inputHeight + spacing.lg;
+          const visibleTop = scrollY + spacing.sm;
+
+          if (inputBottom > visibleBottom) {
+            const nextOffset = scrollOffsetRef.current + (inputBottom - visibleBottom);
+            scrollViewRef.current?.scrollTo({ y: Math.max(0, nextOffset), animated: true });
+          } else if (inputY < visibleTop) {
+            const nextOffset = scrollOffsetRef.current - (visibleTop - inputY);
+            scrollViewRef.current?.scrollTo({ y: Math.max(0, nextOffset), animated: true });
+          }
+        });
+      });
+    }, 120);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const showSubscription = Keyboard.addListener(showEvent, () => {
+      setIsKeyboardVisible(true);
+    });
+    const didShowSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setIsKeyboardVisible(true);
+      scrollToFocusedInput();
+    });
+    const hideSubscription = Keyboard.addListener(hideEvent, () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      didShowSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, [scrollToFocusedInput]);
+
+  const handleClose = useCallback(() => {
+    Keyboard.dismiss();
+    Animated.parallel([
+      Animated.timing(overlayOpacity, {
+        toValue: 0,
+        duration: ANIMATION_DURATION,
+        useNativeDriver: true,
+      }),
+      Animated.timing(animatedValue, {
+        toValue: getInitialValue(),
+        duration: ANIMATION_DURATION,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      onClose();
+    });
+  }, [animatedValue, overlayOpacity, getInitialValue, onClose]);
+
+  const handleCloseRef = useRef(handleClose);
+  handleCloseRef.current = handleClose;
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, gestureState) => {
-        if (side === "bottom") return gestureState.dy > 0;
-        if (side === "top") return gestureState.dy < 0;
+        if (side === "bottom") return gestureState.dy > 6;
+        if (side === "top") return gestureState.dy < -6;
         return false;
       },
       onPanResponderMove: (_, gestureState) => {
@@ -86,7 +193,7 @@ export function SheetModal({
           (side === "top" && gestureState.dy < -threshold);
 
         if (shouldClose) {
-          handleClose();
+          handleCloseRef.current();
         } else {
           Animated.spring(animatedValue, {
             toValue: 0,
@@ -115,28 +222,29 @@ export function SheetModal({
     ]).start();
   }, [animatedValue, overlayOpacity, getInitialValue]);
 
-  const handleClose = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(overlayOpacity, {
-        toValue: 0,
-        duration: ANIMATION_DURATION,
-        useNativeDriver: true,
-      }),
-      Animated.timing(animatedValue, {
-        toValue: getInitialValue(),
-        duration: ANIMATION_DURATION,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onClose();
-    });
-  }, [animatedValue, overlayOpacity, getInitialValue, onClose]);
-
   useEffect(() => {
     if (visible) {
       handleOpen();
     }
   }, [visible, handleOpen]);
+
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    scrollOffsetRef.current = event.nativeEvent.contentOffset.y;
+  }, []);
+
+  const getContainerStyle = () => {
+    switch (side) {
+      case "top":
+        return styles.containerTop;
+      case "left":
+        return styles.containerLeft;
+      case "right":
+        return styles.containerRight;
+      case "bottom":
+      default:
+        return [styles.containerBottom, { paddingTop: insets.top }];
+    }
+  };
 
   const getContentStyle = () => {
     const baseStyle = [
@@ -148,8 +256,21 @@ export function SheetModal({
     ];
 
     const positionStyles = {
-      bottom: [styles.contentBottom, { transform: [{ translateY: animatedValue }] }],
-      top: [styles.contentTop, { transform: [{ translateY: animatedValue }] }],
+      bottom: [
+        styles.contentBottom,
+        {
+          maxHeight: isKeyboardVisible ? "100%" : "90%",
+          paddingBottom: isKeyboardVisible ? 0 : insets.bottom,
+          transform: [{ translateY: animatedValue }],
+        },
+      ],
+      top: [
+        styles.contentTop,
+        {
+          paddingTop: insets.top,
+          transform: [{ translateY: animatedValue }],
+        },
+      ],
       left: [styles.contentLeft, { transform: [{ translateX: animatedValue }] }],
       right: [styles.contentRight, { transform: [{ translateX: animatedValue }] }],
     };
@@ -158,62 +279,74 @@ export function SheetModal({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
-      <View style={styles.container}>
-        <Animated.View style={[styles.overlay]}>
+    <Modal
+      visible={visible}
+      transparent
+      statusBarTranslucent
+      animationType="none"
+      onRequestClose={handleClose}>
+      <KeyboardAvoidingView
+        style={[styles.container, getContainerStyle()]}
+        behavior="padding"
+        enabled={isVertical}>
+        <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
           <Pressable style={styles.overlayPressable} onPress={handleClose} />
         </Animated.View>
 
-        <Animated.View
-          style={[getContentStyle(), { display: "flex", flexDirection: "column" }]}
-          {...(isVertical ? panResponder.panHandlers : {})}>
-          {side === "bottom" && (
-            <View style={[styles.dragIndicator, { backgroundColor: theme.textMuted }]} />
-          )}
+        <Animated.View style={getContentStyle()}>
+          <View {...(isVertical ? panResponder.panHandlers : {})}>
+            {side === "bottom" && (
+              <View style={[styles.dragIndicator, { backgroundColor: theme.textMuted }]} />
+            )}
 
-          {(title || description || showCloseButton) && (
-            <View
-              style={[
-                styles.header,
-                { borderBottomColor: theme.textMuted, borderBottomWidth: 0.2 },
-              ]}>
-              <View style={styles.headerText}>
-                {title && (
-                  <TextComponent style={[styles.title, { color: theme.foreground }]}>
-                    {title}
-                  </TextComponent>
-                )}
-                {description && (
-                  <TextComponent style={[styles.description, { color: theme.mutedForeground }]}>
-                    {description}
-                  </TextComponent>
+            {(title || description || showCloseButton) && (
+              <View
+                style={[
+                  styles.header,
+                  { borderBottomColor: theme.textMuted, borderBottomWidth: 0.2 },
+                ]}>
+                <View style={styles.headerText}>
+                  {title && (
+                    <TextComponent style={[styles.title, { color: theme.foreground }]}>
+                      {title}
+                    </TextComponent>
+                  )}
+                  {description && (
+                    <TextComponent style={[styles.description, { color: theme.mutedForeground }]}>
+                      {description}
+                    </TextComponent>
+                  )}
+                </View>
+                {showCloseButton && (
+                  <Pressable
+                    style={[styles.closeButton]}
+                    onPress={handleClose}
+                    accessibilityRole="button"
+                    accessibilityLabel="Fechar">
+                    <Icon name="X" color={theme.foreground} size={typography.fontSizeBase} />
+                  </Pressable>
                 )}
               </View>
-              {showCloseButton && (
-                <Pressable
-                  style={[styles.closeButton]}
-                  onPress={handleClose}
-                  accessibilityRole="button"
-                  accessibilityLabel="Fechar">
-                  <Icon name="X" color={theme.foreground} size={typography.fontSizeBase} />
-                </Pressable>
-              )}
-            </View>
-          )}
+            )}
+          </View>
 
-          <ScrollView
-            style={styles.body}
-            showsVerticalScrollIndicator={true}
-            scrollEventThrottle={16}
-            nestedScrollEnabled={true}
-            keyboardShouldPersistTaps="handled"
-            removeClippedSubviews={true}
-            scrollEnabled={true}
-            keyboardDismissMode="on-drag">
-            {children}
-          </ScrollView>
+          <SheetModalContext.Provider value={{ scrollToFocusedInput }}>
+            <ScrollView
+              ref={scrollViewRef}
+              style={styles.body}
+              contentContainerStyle={styles.bodyContent}
+              onScroll={handleScroll}
+              showsVerticalScrollIndicator={true}
+              scrollEventThrottle={16}
+              nestedScrollEnabled={true}
+              keyboardShouldPersistTaps="handled"
+              scrollEnabled={true}
+              keyboardDismissMode="on-drag">
+              {children}
+            </ScrollView>
+          </SheetModalContext.Provider>
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -251,6 +384,19 @@ export function SheetDescription({ children }: { children: React.ReactNode }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  containerBottom: {
+    justifyContent: "flex-end",
+  },
+  containerTop: {
+    justifyContent: "flex-start",
+  },
+  containerLeft: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+  },
+  containerRight: {
+    flexDirection: "row",
     justifyContent: "flex-end",
   },
   overlay: {
@@ -261,34 +407,26 @@ const styles = StyleSheet.create({
   },
   content: {
     ...shadows.lg,
-    maxHeight: "90%",
-    flex: 1,
     display: "flex",
     flexDirection: "column",
+    flexShrink: 1,
   },
   contentBottom: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+    width: "100%",
+    maxHeight: "90%",
     borderTopLeftRadius: borderRadius.xl,
     borderTopRightRadius: borderRadius.xl,
     borderTopWidth: 1,
   },
   contentTop: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
+    width: "100%",
+    maxHeight: "90%",
     borderBottomLeftRadius: borderRadius.xl,
     borderBottomRightRadius: borderRadius.xl,
     borderBottomWidth: 1,
   },
   contentLeft: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
+    height: "100%",
     width: "75%",
     maxWidth: 320,
     borderRightWidth: 1,
@@ -296,10 +434,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: borderRadius.xl,
   },
   contentRight: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    right: 0,
+    height: "100%",
     width: "75%",
     maxWidth: 320,
     borderLeftWidth: 1,
@@ -320,7 +455,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     padding: spacing.base,
     gap: spacing.md,
-    marginBottom: spacing.xxl,
   },
   headerText: {
     flex: 1,
@@ -338,11 +472,15 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
   },
   body: {
+    flexGrow: 0,
+    flexShrink: 1,
+    minHeight: 0,
+  },
+  bodyContent: {
     paddingHorizontal: spacing.base,
     paddingTop: spacing.base,
     paddingBottom: spacing.base,
-    flex: 1,
-    minHeight: 0,
+    flexGrow: 1,
   },
   sectionHeader: {
     flexDirection: "column",

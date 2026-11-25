@@ -3,24 +3,24 @@ import { IListPurchaseView } from "~/types/shopList";
 export function calculateValuesByMeasuredUnits(
   amount: number,
   quantity: number,
-  measuredUnit: string
+  measuredUnit?: string
 ): number {
-  let sum = 0;
+  const safeAmount = Number(amount) || 0;
+  const safeQuantity = Number(quantity) || 0;
+  const normalizedUnit = measuredUnit?.trim().toLowerCase() ?? "";
 
-  switch (measuredUnit) {
+  switch (normalizedUnit) {
     case "ml":
     case "g":
-      sum = amount * (quantity / 1000);
-      break;
+      return safeAmount * (safeQuantity / 1000);
+    case "un":
     case "pc":
     case "dz":
     case "l":
     case "kg":
-      sum = amount * quantity;
-      break;
+    default:
+      return safeAmount * safeQuantity;
   }
-
-  return sum;
 }
 
 export function calculateProgress(list: IListPurchaseView[]) {
